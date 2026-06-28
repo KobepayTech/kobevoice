@@ -7,13 +7,17 @@ that runs independently of the GPU/ML engine. Launch with:
 """
 
 import logging
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
 from .db import init_db
 from .routers import admin, auth, billing, usage, voice
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +53,12 @@ def create_app() -> FastAPI:
     app.include_router(usage.router)
     app.include_router(voice.router)
     app.include_router(admin.router)
+
+    # Serve the zero-build dashboard SPA at the root. Mounted last so it never
+    # shadows the /api routes above.
+    if STATIC_DIR.is_dir():
+        app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="dashboard")
+
     return app
 
 

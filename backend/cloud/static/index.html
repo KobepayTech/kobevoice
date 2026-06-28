@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kobevoice Cloud</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span> Kobevoice <span class="muted" style="font-weight:500">Cloud</span></div>
+    <div class="row" id="navUser" hidden>
+      <span class="pill" id="navEmail"></span>
+      <button class="ghost small" id="logoutBtn">Sign out</button>
+    </div>
+  </div>
+
+  <!-- AUTH -->
+  <div class="center-screen" id="authView">
+    <div class="card auth-card">
+      <h2 id="authTitle">Sign in to Kobevoice Cloud</h2>
+      <div class="sub" id="authSub">Generate speech in the cloud. Free plan included.</div>
+      <div id="nameField" class="hidden">
+        <label>Name</label>
+        <input id="fName" placeholder="Your name" />
+      </div>
+      <label>Email</label>
+      <input id="fEmail" type="email" placeholder="you@example.com" />
+      <label>Password</label>
+      <input id="fPassword" type="password" placeholder="••••••••" />
+      <div class="error" id="authError"></div>
+      <button id="authSubmit" style="width:100%">Sign in</button>
+      <div class="muted" style="margin-top:14px; font-size:13px">
+        <span id="authToggleText">No account?</span>
+        <a href="#" id="authToggle">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="container hidden" id="appView">
+    <div class="tabs">
+      <div class="tab active" data-tab="overview">Overview</div>
+      <div class="tab" data-tab="plans">Plans &amp; Billing</div>
+      <div class="tab" data-tab="generate">Generate</div>
+      <div class="tab" data-tab="keys">API Keys</div>
+      <div class="tab hidden" data-tab="admin" id="adminTabBtn">Admin</div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section data-pane="overview" class="grid cols-2">
+      <div class="card">
+        <h2>Your plan</h2>
+        <div class="sub">Current subscription &amp; status</div>
+        <div class="row"><strong id="planName" style="font-size:20px">—</strong> <span class="pill ok" id="planStatus">—</span></div>
+        <div class="muted" id="planRenew" style="margin-top:8px;font-size:13px"></div>
+        <button class="ghost small" id="goPlansBtn" style="margin-top:14px">Change plan</button>
+      </div>
+      <div class="card">
+        <h2>Usage this period</h2>
+        <div class="sub" id="usagePeriod">—</div>
+        <label>Generations <span class="muted" id="genLabel"></span></label>
+        <div class="bar"><span id="genBar" style="width:0%"></span></div>
+        <label>Characters <span class="muted" id="charLabel"></span></label>
+        <div class="bar"><span id="charBar" style="width:0%"></span></div>
+      </div>
+    </section>
+
+    <!-- PLANS -->
+    <section data-pane="plans" class="hidden">
+      <div class="card">
+        <h2>Plans &amp; Billing</h2>
+        <div class="sub">Upgrade for more generations and voice profiles.</div>
+        <div class="grid cols-2" id="plansGrid"></div>
+        <div class="error" id="billingError" style="margin-top:12px"></div>
+        <button class="ghost small" id="portalBtn" style="margin-top:14px" hidden>Manage billing →</button>
+      </div>
+    </section>
+
+    <!-- GENERATE -->
+    <section data-pane="generate" class="hidden">
+      <div class="card">
+        <h2>Generate speech</h2>
+        <div class="sub">Sends text through the metered cloud voice gateway.</div>
+        <label>Text</label>
+        <textarea id="speakText" rows="4" placeholder="Type something to speak…">Hello from Kobevoice Cloud.</textarea>
+        <div class="row" style="margin-top:12px">
+          <button id="speakBtn">Generate</button>
+          <span class="muted" id="speakHint" style="font-size:13px"></span>
+        </div>
+        <div class="error" id="speakError"></div>
+        <pre id="speakResult" class="muted" style="white-space:pre-wrap;font-size:12px;margin-top:10px"></pre>
+      </div>
+    </section>
+
+    <!-- KEYS -->
+    <section data-pane="keys" class="hidden">
+      <div class="card">
+        <h2>API keys</h2>
+        <div class="sub">For headless / agent access to <code>POST /api/voice/speak</code> via the <code>X-API-Key</code> header.</div>
+        <div class="row">
+          <input id="keyName" placeholder="Key name (e.g. my-agent)" style="max-width:280px" />
+          <button id="createKeyBtn">Create key</button>
+        </div>
+        <div class="success" id="newKey" style="margin-top:12px"></div>
+        <table style="margin-top:16px"><thead><tr><th>Prefix</th><th>Name</th><th>Created</th><th>Status</th><th></th></tr></thead>
+          <tbody id="keysBody"></tbody></table>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section data-pane="admin" class="hidden">
+      <div class="card">
+        <h2>Admin · Studio backoffice</h2>
+        <div class="sub">Overview of all accounts and revenue.</div>
+        <div class="grid cols-2" id="adminStats"></div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Users</h2>
+        <table><thead><tr><th>Email</th><th>Plan</th><th>Status</th><th>Gens</th><th></th></tr></thead>
+          <tbody id="adminUsers"></tbody></table>
+      </div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

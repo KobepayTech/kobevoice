@@ -11,6 +11,14 @@ export const CLOUD_PRICE_YEARLY = 12; // launch price for the Cloud tier (USD/yr
 /** Where "get notified" CTAs point until there's a real signup flow. */
 export const CLOUD_NOTIFY_URL = "https://x.com/KobevoiceAI";
 
+/**
+ * The live Kobevoice Cloud dashboard (signup/login). Backed by the
+ * `backend/cloud` control-plane. Override per-environment with
+ * NEXT_PUBLIC_CLOUD_APP_URL.
+ */
+export const CLOUD_APP_URL =
+	process.env.NEXT_PUBLIC_CLOUD_APP_URL || "https://app.kobevoice.app";
+
 export type BillingPeriod = "monthly" | "annual";
 
 export interface PricingTier {
@@ -56,8 +64,8 @@ export const PRICING_TIERS: PricingTier[] = [
 		annual: CLOUD_PRICE_YEARLY, // $12 launch price (≈50% off monthly)
 		priceNote: "Launch price · free for $KOBEVOICE holders",
 		highlighted: true,
-		badge: "Coming soon",
-		cta: {label: "Get notified", href: CLOUD_NOTIFY_URL},
+		badge: "Available now",
+		cta: {label: "Start free", href: CLOUD_APP_URL},
 		features: [
 			"Everything in Local",
 			"End-to-end encrypted backup — we can't read it",
@@ -74,8 +82,8 @@ export const PRICING_TIERS: PricingTier[] = [
 		monthly: 6, // placeholder
 		annual: 48, // placeholder
 		priceNote: "Placeholder — pricing TBD",
-		badge: "Coming soon",
-		cta: {label: "Get notified", href: CLOUD_NOTIFY_URL},
+		badge: "Available now",
+		cta: {label: "Start free", href: CLOUD_APP_URL},
 		features: [
 			"Everything in Cloud",
 			"250 GB encrypted storage", // placeholder
