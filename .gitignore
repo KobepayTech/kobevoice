@@ -68,3 +68,9 @@ temp/
 backend/tests/results/
 backend/tests/fixtures/reference_voice.wav
 backend/tests/fixtures/reference_voice.txt
+
+# Kobevoice Cloud local artifacts
+.venv-cloud/
+.venv/
+backend/cloud/.env
+*.db
