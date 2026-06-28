@@ -32,7 +32,7 @@ trips the decorator chain.
 
 Fix
 ---
-voicebox never uses torch.compile / torch._dynamo for inference, so we
+kobevoice never uses torch.compile / torch._dynamo for inference, so we
 replace torch._dynamo with a no-op stub module before transformers is
 imported. Any attribute access on the stub returns a pass-through callable,
 so `@torch._dynamo.allow_in_graph`, `torch._dynamo.is_compiling()`,
@@ -60,7 +60,7 @@ import types
 # Diagnostics — log hook activity to a file alongside the bundle so we can
 # see what's happening when the server is run as a sidecar (no stdout for
 # runtime hook prints). Safe no-op if the file can't be written.
-_DIAG_PATH = os.path.join(tempfile.gettempdir(), "voicebox_rt_hook.log")
+_DIAG_PATH = os.path.join(tempfile.gettempdir(), "kobevoice_rt_hook.log")
 
 
 def _diag(msg: str) -> None:
@@ -193,7 +193,7 @@ class _TransformersStubFinder:
        unbound before `del obj`.
 
        The exports (AssistedCandidateGenerator, EarlyExitCandidateGenerator,
-       etc.) are speculative-decoding helpers voicebox's TTS engines do not
+       etc.) are speculative-decoding helpers kobevoice's TTS engines do not
        use; a no-op stub module satisfies the imports.
     """
 

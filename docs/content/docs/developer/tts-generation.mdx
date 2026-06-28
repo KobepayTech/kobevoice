@@ -1,11 +1,11 @@
 ---
 title: "TTS Generation"
-description: "How text-to-speech generation works across Voicebox's multi-engine backend"
+description: "How text-to-speech generation works across Kobevoice's multi-engine backend"
 ---
 
 ## Overview
 
-Voicebox ships seven TTS engines — Qwen3-TTS, Qwen CustomVoice, LuxTTS, Chatterbox Multilingual, Chatterbox Turbo, TADA, and Kokoro — behind a single `TTSBackend` Protocol. All of them expose the same async interface so the routes and services don't need per-engine branching.
+Kobevoice ships seven TTS engines — Qwen3-TTS, Qwen CustomVoice, LuxTTS, Chatterbox Multilingual, Chatterbox Turbo, TADA, and Kokoro — behind a single `TTSBackend` Protocol. All of them expose the same async interface so the routes and services don't need per-engine branching.
 
 This page covers how generation flows through that abstraction. For the step-by-step guide to adding a new engine, see [TTS Engines](/developer/tts-engines).
 
@@ -115,7 +115,7 @@ cache_key = f"{engine}_{hash(audio_path, reference_text)}"
 
 Engines pick their device through `get_torch_device()` in `backends/base.py`, which layers:
 
-1. `VOICEBOX_FORCE_CPU` environment override
+1. `KOBEVOICE_FORCE_CPU` environment override
 2. CUDA (if compiled and available)
 3. XPU (Intel Arc via IPEX)
 4. MPS (Apple Silicon) — **only for engines that support it**; some (Chatterbox, older Qwen paths) skip MPS and fall back to CPU due to upstream operator gaps

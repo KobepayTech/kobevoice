@@ -27,11 +27,11 @@ def build_server(cuda=False):
 
     Args:
         cuda: If True, build with CUDA support and name the binary
-              voicebox-server-cuda instead of voicebox-server.
+              kobevoice-server-cuda instead of kobevoice-server.
     """
     backend_dir = Path(__file__).parent
 
-    binary_name = "voicebox-server-cuda" if cuda else "voicebox-server"
+    binary_name = "kobevoice-server-cuda" if cuda else "kobevoice-server"
 
     # PyInstaller arguments
     # CUDA builds use --onedir so we can split the output into two archives:
@@ -295,7 +295,7 @@ def build_server(cuda=False):
             "unidic_lite",
             "--hidden-import",
             "loguru",
-            # MCP server — Streamable-HTTP endpoint and the 4 voicebox.* tools.
+            # MCP server — Streamable-HTTP endpoint and the 4 kobevoice.* tools.
             # FastMCP pulls in a chain of deps (mcp, cyclopts, openapi-pydantic,
             # etc.) that don't auto-discover cleanly under PyInstaller, so we
             # collect them whole. Small compared to torch.
@@ -481,10 +481,10 @@ def build_server(cuda=False):
 
 
 def build_shim():
-    """Build the voicebox-mcp stdio shim as a tiny standalone binary.
+    """Build the kobevoice-mcp stdio shim as a tiny standalone binary.
 
     This is the bridge for MCP clients that only speak stdio — it proxies
-    JSON-RPC to the main voicebox-server's /mcp endpoint. Keep it small: no
+    JSON-RPC to the main kobevoice-server's /mcp endpoint. Keep it small: no
     torch, no ML deps, just httpx + asyncio.
     """
     backend_dir = Path(__file__).parent
@@ -493,7 +493,7 @@ def build_shim():
         "mcp_shim/__main__.py",
         "--onefile",
         "--name",
-        "voicebox-mcp",
+        "kobevoice-mcp",
         # Stdio-only — no console hiding needed on Windows since the parent
         # MCP client is spawning this as a child process and wants stdio.
         "--hidden-import",
@@ -567,20 +567,20 @@ def build_shim():
 
     os.chdir(backend_dir)
     PyInstaller.__main__.run(args)
-    logger.info("Shim built: %s", backend_dir / "dist" / "voicebox-mcp")
+    logger.info("Shim built: %s", backend_dir / "dist" / "kobevoice-mcp")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Build voicebox binaries")
+    parser = argparse.ArgumentParser(description="Build kobevoice binaries")
     parser.add_argument(
         "--cuda",
         action="store_true",
-        help="Build CUDA-enabled binary (voicebox-server-cuda)",
+        help="Build CUDA-enabled binary (kobevoice-server-cuda)",
     )
     parser.add_argument(
         "--shim",
         action="store_true",
-        help="Build the voicebox-mcp stdio shim binary instead of the server",
+        help="Build the kobevoice-mcp stdio shim binary instead of the server",
     )
     cli_args = parser.parse_args()
     if cli_args.shim:

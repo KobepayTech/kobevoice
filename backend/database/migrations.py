@@ -1,6 +1,6 @@
-"""Column-level migrations for the voicebox SQLite database.
+"""Column-level migrations for the kobevoice SQLite database.
 
-Why not Alembic?  voicebox is a single-user desktop app shipping as a
+Why not Alembic?  kobevoice is a single-user desktop app shipping as a
 PyInstaller binary.  Every user has exactly one SQLite file.  Alembic's
 strengths -- migration tracking across environments, rollback, team
 coordination -- don't apply here and would add bundling complexity
@@ -249,7 +249,7 @@ def _migrate_mcp_bindings(engine, inspector, tables: set[str]) -> None:
     """Drop the legacy ``default_intent`` column and add ``default_personality``.
 
     The intent tri-state (respond / rewrite / compose) has been collapsed
-    to a boolean: when true, ``voicebox.speak`` rewrites input through the
+    to a boolean: when true, ``kobevoice.speak`` rewrites input through the
     profile's personality LLM before TTS.
     """
     if "mcp_client_bindings" not in tables:

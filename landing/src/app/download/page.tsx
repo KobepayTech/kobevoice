@@ -124,20 +124,20 @@ export default function DownloadPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">
             <Image
-              src="/voicebox-logo-app.webp"
-              alt="Voicebox"
+              src="/kobevoice-logo-app.webp"
+              alt="Kobevoice"
               width={28}
               height={28}
               className="h-7 w-7"
             />
-            <span className="text-[15px] font-semibold text-foreground">Voicebox</span>
+            <span className="text-[15px] font-semibold text-foreground">Kobevoice</span>
           </Link>
           <Link
             href="/"
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to voicebox.sh
+            Back to kobevoice.app
           </Link>
         </div>
       </header>
@@ -146,8 +146,8 @@ export default function DownloadPage() {
         {/* Hero */}
         <div className="flex flex-col md:flex-row md:items-center gap-10 md:gap-14">
           <Image
-            src="/voicebox-logo-app.webp"
-            alt="Voicebox"
+            src="/kobevoice-logo-app.webp"
+            alt="Kobevoice"
             width={200}
             height={200}
             priority
@@ -161,14 +161,14 @@ export default function DownloadPage() {
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   {activeMeta
-                    ? `Downloading Voicebox for ${activeMeta.label} (${activeMeta.description}). Check your downloads folder.`
-                    : 'Check your downloads folder for Voicebox.'}
+                    ? `Downloading Kobevoice for ${activeMeta.label} (${activeMeta.description}). Check your downloads folder.`
+                    : 'Check your downloads folder for Kobevoice.'}
                 </p>
               </>
             ) : (
               <>
                 <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
-                  {linksError ? "We couldn't load the latest release." : 'Download Voicebox'}
+                  {linksError ? "We couldn't load the latest release." : 'Download Kobevoice'}
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   {linksError
@@ -245,10 +245,10 @@ export default function DownloadPage() {
               </span>
             </div>
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-4">
-              Jamie here — Voicebox is a side project.
+              Jamie here — Kobevoice is a side project.
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-6 max-w-2xl">
-              I build and maintain Voicebox in my spare time. It's completely
+              I build and maintain Kobevoice in my spare time. It's completely
               free, open source, runs entirely on your machine — no accounts, no
               cloud, no subscriptions, no upsells. If it saves you an ElevenLabs
               bill or just made your day, a coffee genuinely helps me keep
@@ -269,7 +269,7 @@ export default function DownloadPage() {
           <h2 className="text-sm font-medium text-foreground mb-4">While you wait</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a
-              href="https://docs.voicebox.sh"
+              href="https://docs.kobevoice.app"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-xl border border-border bg-card/60 backdrop-blur-sm p-5 hover:border-accent/30 hover:bg-card transition-all group"
@@ -277,11 +277,11 @@ export default function DownloadPage() {
               <FileText className="h-5 w-5 text-accent mb-3" />
               <h3 className="text-sm font-medium text-foreground mb-1">Read the docs</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Get familiar with Voicebox — setup, voice cloning, the REST API.
+                Get familiar with Kobevoice — setup, voice cloning, the REST API.
               </p>
             </a>
             <a
-              href="https://deepwiki.com/jamiepine/voicebox"
+              href="https://deepwiki.com/kobepaytech/kobevoice"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-xl border border-border bg-card/60 backdrop-blur-sm p-5 hover:border-accent/30 hover:bg-card transition-all group"
@@ -289,7 +289,7 @@ export default function DownloadPage() {
               <Bot className="h-5 w-5 text-accent mb-3" />
               <h3 className="text-sm font-medium text-foreground mb-1">Got questions? Ask AI.</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                DeepWiki is an AI that knows Voicebox inside-out. Ask anything.
+                DeepWiki is an AI that knows Kobevoice inside-out. Ask anything.
               </p>
             </a>
             <a

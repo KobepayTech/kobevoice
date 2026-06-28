@@ -1,9 +1,9 @@
-"""POST /speak — REST wrapper around voicebox.speak for non-MCP callers.
+"""POST /speak — REST wrapper around kobevoice.speak for non-MCP callers.
 
 Shell scripts, ACP, A2A, or any agent that doesn't speak MCP can hit this
 endpoint to play text through a cloned voice. Uses the same profile
 resolution and generation pipeline as the MCP tool, so per-client
-bindings (via X-Voicebox-Client-Id) work identically.
+bindings (via X-Kobevoice-Client-Id) work identically.
 """
 
 from __future__ import annotations
@@ -30,13 +30,13 @@ async def speak(
     request: Request,
     db: Session = Depends(get_db),
 ):
-    """Speak text in a voice profile. Mirrors voicebox.speak (MCP).
+    """Speak text in a voice profile. Mirrors kobevoice.speak (MCP).
 
     Response shape matches POST /generate — a ``GenerationResponse`` with
     ``status="generating"`` and an ``id`` the caller polls at
     ``GET /generate/{id}/status``.
     """
-    client_id = request.headers.get("X-Voicebox-Client-Id")
+    client_id = request.headers.get("X-Kobevoice-Client-Id")
     profile = resolve_profile(data.profile, client_id, db)
     if profile is None:
         if data.profile:
@@ -48,7 +48,7 @@ async def speak(
             status_code=400,
             detail=(
                 "No voice profile resolved. Pass `profile` (name or id), "
-                "or configure a default in Voicebox → Settings → MCP."
+                "or configure a default in Kobevoice → Settings → MCP."
             ),
         )
 

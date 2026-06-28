@@ -64,7 +64,7 @@ Paste half (macOS):
   `NSRunningApplication.activateWithOptions:` for re-activation.
 - `accessibility.rs` — `AXIsProcessTrusted` gate.
 - `paste_final_text` command — activate → 120 ms settle → save clip →
-  write text → ⌘V → 400 ms → restore. Skips when focus was in Voicebox
+  write text → ⌘V → 400 ms → restore. Skips when focus was in Kobevoice
   itself.
 - Focus rides the `dictate:start` event payload; `DictateWindow` holds the
   snapshot in a ref and consume-once-nulls on paste so a late-arriving
@@ -75,13 +75,13 @@ Paste half (macOS):
 Outstanding: Windows `SendInput` / UIAutomation / `SetForegroundWindow`
 equivalents, Linux `uinput` / AT-SPI equivalents (and the Wayland story),
 first-run Accessibility prompt UI with deep-link to System Settings,
-direct-injection path for focus-was-inside-Voicebox (step 6 — dictating
+direct-injection path for focus-was-inside-Kobevoice (step 6 — dictating
 into our own Generate tab currently falls back to the capture list).
 
 ### Not started
 
 - **Phase 5 — Agent voice output + persona loop.** No `/speak` endpoint, no
-  `voicebox.speak` MCP tool, no per-agent voice binding, no persona metadata
+  `kobevoice.speak` MCP tool, no per-agent voice binding, no persona metadata
   on profiles.
 - **Phase 6 — STT engine expansion.** Only Whisper (`mlx_backend.py`).
   Parakeet v3, Qwen3-ASR, Kyutai — all unregistered.
@@ -120,7 +120,7 @@ Called out in recent sessions but not yet in a phase:
 
 ## Overview
 
-Voicebox ships the output half of a voice I/O loop: clone a voice, generate
+Kobevoice ships the output half of a voice I/O loop: clone a voice, generate
 speech, apply effects, compose multi-voice projects. The input half — speech to
 text, dictation, routing — exists today as a single Whisper model wired into the
 Recording & Transcription panel. This doc proposes making voice *input* a
@@ -128,18 +128,18 @@ first-class pillar: more STT engines, a dictation shell (global hotkey, audio
 capture, paste, streaming), a local LLM backend, and a user-configurable
 pipeline from captured audio to whatever the user wants to do with it.
 
-Positioning is the key move. **Voicebox becomes the local voice I/O layer for
+Positioning is the key move. **Kobevoice becomes the local voice I/O layer for
 humans and AI agents** — a local alternative to cloud dictation tools, with the
 differentiator that we also do TTS and voice cloning. The same app that
 captures your voice can generate a response in any voice profile you've
-cloned. "Anything voice is Voicebox."
+cloned. "Anything voice is Kobevoice."
 
 ### Positioning shift
 
-Before this plan, Voicebox was **"the open-source AI voice cloning studio."**
+Before this plan, Kobevoice was **"the open-source AI voice cloning studio."**
 Cloning was the headline capability.
 
-After this plan, Voicebox is **"the open-source AI voice studio."** Cloning is
+After this plan, Kobevoice is **"the open-source AI voice studio."** Cloning is
 one capability in a broader category that now spans input (STT, dictation),
 intelligence (local LLM, refinement, persona), output (TTS, cloning, effects,
 Stories), and routing. The word "cloning" drops out of the top-line descriptor
@@ -147,7 +147,7 @@ because it's become a feature rather than the thesis.
 
 ### Competitive frame
 
-Voicebox ends up covering the territory of two separately-funded, separately
+Kobevoice ends up covering the territory of two separately-funded, separately
 branded cloud incumbents that operate on opposite sides of the same voice I/O
 loop:
 
@@ -155,7 +155,7 @@ loop:
 - **WisprFlow** (~$70M raised): voice dictation for agents and power users —
   the "users talk" side
 
-Both are cloud-only. Voicebox becomes the only local alternative to either,
+Both are cloud-only. Kobevoice becomes the only local alternative to either,
 running in one app, with a single model directory and LLM shared between input
 and output. That bridging — dictation → LLM → TTS with a cloned voice in the
 middle — is the thing no single incumbent can match, because neither has the
@@ -167,10 +167,10 @@ These are not engineering tasks but should ride the Phase 4 ship so marketing
 and positioning stay in sync with the product.
 
 - **README.md** — drop "cloning" from the top-line descriptor. Add a section
-  that explicitly frames Voicebox as "the open-source local alternative to
+  that explicitly frames Kobevoice as "the open-source local alternative to
   WisprFlow and ElevenLabs." Competitive framing belongs in the README and on
   the landing page — not in-app (reads as defensive).
-- **voicebox.sh landing page** — same positioning shift.
+- **kobevoice.app landing page** — same positioning shift.
 - **GitHub About / repo topics** — swap "voice-cloning" or similar tags for
   broader "voice-io," "local-tts," "local-stt," etc.
 - **Release notes** — the Phase 4 launch note is the "we're now voice I/O" moment.
@@ -187,11 +187,11 @@ and positioning stay in sync with the product.
 - The **persona loop** — speak to an agent, have it reply in a cloned voice —
   is a feature only we can ship. Nobody with a dictation product has TTS; nobody
   with a TTS product has good dictation. The full duplex is ours.
-- Agent harnesses already pipe Voicebox TTS into their stacks. Giving those
-  users STT from the same app closes the loop and makes Voicebox the default
+- Agent harnesses already pipe Kobevoice TTS into their stacks. Giving those
+  users STT from the same app closes the loop and makes Kobevoice the default
   voice I/O layer for the agentic dev-tool crowd.
 - **Typing a 2,000-character TTS script is user-hostile.** The most immediate
-  internal win is dictating directly into Voicebox's own generation form —
+  internal win is dictating directly into Kobevoice's own generation form —
   speak the script, generate the voice. This dogfoods the whole STT pipeline
   without touching a single OS-level API.
 - **Voice-to-voice models are landing.** Moshi (Kyutai), GLM-4-Voice, Qwen2.5
@@ -202,7 +202,7 @@ and positioning stay in sync with the product.
 ## Non-goals
 
 - Cloud fallback or "bring your own API key" STT/LLM. Local is the product.
-- A separate tray-only dictation app. We extend Voicebox, not fork it.
+- A separate tray-only dictation app. We extend Kobevoice, not fork it.
 - Replacing the Stories editor with a notes layout. Long-form capture is a
   preset on top of the pipeline, not a new product surface.
 - Real-time translation UI. It can exist as a transform later, but it's not in
@@ -262,7 +262,7 @@ API call (WS / HTTP) ──┘                                 MCP server sink
 
 `Source → Transform → Sink` is internal, dataflow-style vocabulary (same shape
 as Unix pipes, Apache Beam, Kafka) — not user-facing. The UI surface will use
-Voicebox-native language (see open questions).
+Kobevoice-native language (see open questions).
 
 Concrete preset examples this shape enables:
 
@@ -310,7 +310,7 @@ branching behavior, not four separate sinks.
 
 | Target | Delivery strategy |
 |---|---|
-| Focused text field inside Voicebox | Direct React state update via event. No clipboard involved. |
+| Focused text field inside Kobevoice | Direct React state update via event. No clipboard involved. |
 | Focused text field in another app | Accessibility-verified paste: save clipboard, write transcript, simulate paste, restore clipboard. |
 | No text focus detected | Clipboard only, toast notification ("Transcript copied — no text field focused"). |
 | Platform-specific special cases (terminal apps, specific editors) | Per-app overrides where the generic path misbehaves. |
@@ -355,7 +355,7 @@ Generate · Stories · Captures · Voices · Effects · Models · Settings.
 ### Parallel explainer on the Generate tab
 
 The Captures settings page gets a "What's different" aside that introduces
-Voicebox's dictation story. The Generate tab deserves a parallel — first-time
+Kobevoice's dictation story. The Generate tab deserves a parallel — first-time
 users need to be told what voice generation is *for* in a post-Voice-I/O
 world, not just handed a text field.
 
@@ -394,13 +394,13 @@ Dictation is one half of the loop — user speaks, agent listens. The other half
 first-class primitive rather than being buried as a TTS loopback sink or a
 consumer read-aloud button.
 
-The shape is a single new capability: any agent can call Voicebox to speak
+The shape is a single new capability: any agent can call Kobevoice to speak
 arbitrary text in a user-configured voice. The same pill that surfaces during
 dictation surfaces during agent speech, so the user always sees what's coming
 out of their machine.
 
 ```
-MCP tool:  voicebox.speak({ text, profile?, style? })
+MCP tool:  kobevoice.speak({ text, profile?, style? })
 REST:      POST /speak { text, profile_id?, style? }
 ```
 
@@ -422,7 +422,7 @@ audio through system output, and surface the pill in a `speaking` state.
 - **Mute + rate limits.** One-toggle mute for all agent speech. Per-source
   rate limits prevent a runaway agent from monologuing.
 
-This primitive is what makes "Voicebox as voice layer for every agent on your
+This primitive is what makes "Kobevoice as voice layer for every agent on your
 machine" a concrete shipping capability rather than marketing language. MCP,
 ACP, and A2A integrations all slot into it — none of those agent protocols
 need to know anything about TTS models, GPU placement, or voice profiles.
@@ -517,7 +517,7 @@ tracking these models.
 1. **Tab name.** Leaning **Captures** — neutral, extensible across dictation,
    long-form recordings, and uploaded audio without repainting the tab later.
    "Dictations" is narrower (office-productivity coded, doesn't fit meeting
-   recordings). "Notes" is the wrong mental model — nobody opens Voicebox to
+   recordings). "Notes" is the wrong mental model — nobody opens Kobevoice to
    write notes. "Transcriptions" is flat.
 2. **Refinement vocabulary.** The LLM-post-STT step needs a user-facing name.
    "Refine," "polish," "rewrite," "smart edit" are candidates. "Refinement" in
@@ -532,7 +532,7 @@ tracking these models.
 5. **Long-form capture product surface.** Pure preset, or dedicated entry point
    in the new tab? Leaning preset, but long-form is the feature that most
    justifies its own landing page.
-6. **Hotkey primitive naming.** Hold-vs-tap needs Voicebox-native phrasing in
+6. **Hotkey primitive naming.** Hold-vs-tap needs Kobevoice-native phrasing in
    UI copy. Settings can still use industry-standard terms.
 
 ## Ordered phases
@@ -565,9 +565,9 @@ No new runtime. No `llama.cpp`, no `ollama`, no fragmented model cache.
 
 ### Phase 3 — In-app voice input
 
-A universal mic button on every Voicebox text input. Hold, speak, release —
+A universal mic button on every Kobevoice text input. Hold, speak, release —
 text lands in the focused field via direct React state update. No OS APIs
-involved; Voicebox owns the input.
+involved; Kobevoice owns the input.
 
 Marquee use cases:
 
@@ -593,7 +593,7 @@ of the persona loop and it lands here for free — no LLM involved, no new
 backend endpoints, just a Captures-tab button that sends the transcript text
 to the existing `/generate` endpoint with a user-selected voice profile and
 plays the result. Category-defining differentiator from the v1 prototype
-onward: Superwhisper and WisprFlow cannot do this because they have no TTS. Voicebox can, with one day of frontend wiring.
+onward: Superwhisper and WisprFlow cannot do this because they have no TTS. Kobevoice can, with one day of frontend wiring.
 
 Keep it aggressively minimal on day one. A capture list, a detail view, a
 model picker, a Play-as-voice dropdown. Refinement prompt editing, correction
@@ -602,11 +602,11 @@ Tier-2 work when someone actually asks for them.
 
 ### Phase 5 — Agent voice output + persona loop
 
-Two features that together make "Voicebox as the voice layer for every agent
+Two features that together make "Kobevoice as the voice layer for every agent
 on your machine" a shipping reality:
 
-1. **`speak()` primitive.** New `POST /speak` endpoint and `voicebox.speak`
-   MCP tool. Any agent calls Voicebox to speak arbitrary text in a
+1. **`speak()` primitive.** New `POST /speak` endpoint and `kobevoice.speak`
+   MCP tool. Any agent calls Kobevoice to speak arbitrary text in a
    user-configured voice; the pill surfaces in a `speaking` state. Settings
    UI for default voice, per-agent voice binding (Claude Code → Morgan,
    Cursor → Scarlett), and a global mute.

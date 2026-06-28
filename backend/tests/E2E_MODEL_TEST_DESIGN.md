@@ -48,10 +48,10 @@ Search order — **first hit wins**:
 
 | Platform | Path | Build type |
 |----------|------|------------|
-| macOS    | `backend/dist/voicebox-server-cuda/voicebox-server-cuda` | onedir (CUDA, rarely on Mac) |
-| macOS    | `backend/dist/voicebox-server`                          | onefile (CPU) |
-| Windows  | `backend\dist\voicebox-server-cuda\voicebox-server-cuda.exe` | onedir (CUDA) |
-| Windows  | `backend\dist\voicebox-server.exe`                      | onefile (CPU) |
+| macOS    | `backend/dist/kobevoice-server-cuda/kobevoice-server-cuda` | onedir (CUDA, rarely on Mac) |
+| macOS    | `backend/dist/kobevoice-server`                          | onefile (CPU) |
+| Windows  | `backend\dist\kobevoice-server-cuda\kobevoice-server-cuda.exe` | onedir (CUDA) |
+| Windows  | `backend\dist\kobevoice-server.exe`                      | onefile (CPU) |
 
 If none exist, run `python backend/build_binary.py` and wait for it to finish (can take 5-20 min). Fail with a clear error if the build itself fails. `--skip-build` flag forces "error out if no binary" instead of building.
 
@@ -64,7 +64,7 @@ Mirrors Tauri's launch in `tauri/src-tauri/src/main.rs:369-388`:
 ```
 
 - **Port**: bind to `0` first in Python to grab a free port, then pass that number.
-- **Data dir**: `tempfile.mkdtemp(prefix="voicebox-e2e-")`. Deleted after the run unless `--keep-data-dir`. Profiles and generated WAVs land here.
+- **Data dir**: `tempfile.mkdtemp(prefix="kobevoice-e2e-")`. Deleted after the run unless `--keep-data-dir`. Profiles and generated WAVs land here.
 - **Parent PID**: current Python PID — ensures the backend dies if the test crashes (watchdog in `server.py:102-224`).
 - **stdout/stderr**: tee to both a log file in `./results/server-<timestamp>.log` and a rolling in-memory buffer. On model failure, last 100 lines of the buffer are attached to that model's error record.
 
@@ -136,7 +136,7 @@ On timeout: cancel the SSE stream, mark the row `timeout`, and continue to the n
 ```json
 {
   "platform": "darwin-arm64",
-  "binary": "/abs/path/voicebox-server",
+  "binary": "/abs/path/kobevoice-server",
   "binary_size_mb": 612,
   "started_at": "2026-04-16T12:34:56Z",
   "finished_at": "...",
@@ -160,7 +160,7 @@ On timeout: cancel the SSE stream, mark the row `timeout`, and continue to the n
 Companion `./results/e2e-<...>.md`:
 
 ```
-# Voicebox E2E — darwin-arm64 — 2026-04-16 12:34
+# Kobevoice E2E — darwin-arm64 — 2026-04-16 12:34
 
 | Engine              | Size | Status | Elapsed | Error |
 |---------------------|------|--------|---------|-------|
@@ -208,7 +208,7 @@ The script uses only stdlib + `httpx` (or `requests`) + `sseclient-py` — all a
 
 - Always kill the spawned binary in a `try/finally`. On Windows, `taskkill /F /T` the whole tree (Tauri does the same).
 - Verify the port is free on shutdown (Tauri port-reuse check in `main.rs:114-186` could otherwise pick up a ghost).
-- Don't touch the user's HF cache by default — let the server use `HF_HUB_CACHE` / `VOICEBOX_MODELS_DIR`. Passing `--isolated-cache` would point both env vars at the tempdir for a true cold-start run (opt-in only; would re-download every time).
+- Don't touch the user's HF cache by default — let the server use `HF_HUB_CACHE` / `KOBEVOICE_MODELS_DIR`. Passing `--isolated-cache` would point both env vars at the tempdir for a true cold-start run (opt-in only; would re-download every time).
 
 ## Non-goals
 

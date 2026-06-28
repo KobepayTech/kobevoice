@@ -1,5 +1,5 @@
 # ============================================================
-# Voicebox — Local TTS Server with Web UI (CPU)
+# Kobevoice — Local TTS Server with Web UI (CPU)
 # 3-stage build: Frontend → Python deps → Runtime
 # ============================================================
 
@@ -45,8 +45,8 @@ RUN pip install --no-cache-dir --prefix=/install \
 FROM python:3.11-slim
 
 # Create non-root user for security
-RUN groupadd -r voicebox && \
-    useradd -r -g voicebox -m -s /bin/bash voicebox
+RUN groupadd -r kobevoice && \
+    useradd -r -g kobevoice -m -s /bin/bash kobevoice
 
 WORKDIR /app
 
@@ -60,17 +60,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=backend-builder /install /usr/local
 
 # Copy backend application code
-COPY --chown=voicebox:voicebox backend/ /app/backend/
+COPY --chown=kobevoice:kobevoice backend/ /app/backend/
 
 # Copy built frontend from frontend stage
-COPY --from=frontend --chown=voicebox:voicebox /build/web/dist /app/frontend/
+COPY --from=frontend --chown=kobevoice:kobevoice /build/web/dist /app/frontend/
 
 # Create data directories owned by non-root user
 RUN mkdir -p /app/data/generations /app/data/profiles /app/data/cache \
-    && chown -R voicebox:voicebox /app/data
+    && chown -R kobevoice:kobevoice /app/data
 
 # Switch to non-root user
-USER voicebox
+USER kobevoice
 
 # Expose the API port
 EXPOSE 17493

@@ -23,7 +23,7 @@ const SCENARIOS: Scenario[] = [
       { prefix: '$', text: 'claude run', tone: 'accent' },
       { prefix: '✓', text: 'Tests passing (42 files)', tone: 'success' },
       { prefix: '✓', text: 'Build succeeded in 12.4s', tone: 'success' },
-      { prefix: '→', text: 'voicebox.speak({ profile: "Morgan" })', tone: 'dim' },
+      { prefix: '→', text: 'kobevoice.speak({ profile: "Morgan" })', tone: 'dim' },
     ],
     utterance: 'Tests passing. Ready to merge.',
   },
@@ -35,7 +35,7 @@ const SCENARIOS: Scenario[] = [
       { prefix: '$', text: 'cursor agent:deploy', tone: 'accent' },
       { prefix: '✓', text: 'Migration applied (4 tables)', tone: 'success' },
       { prefix: '✓', text: 'Deploy complete', tone: 'success' },
-      { prefix: '→', text: 'voicebox.speak({ profile: "Scarlett" })', tone: 'dim' },
+      { prefix: '→', text: 'kobevoice.speak({ profile: "Scarlett" })', tone: 'dim' },
     ],
     utterance: 'Deploy shipped. Prod is green.',
   },
@@ -46,7 +46,7 @@ const SCENARIOS: Scenario[] = [
     log: [
       { prefix: '$', text: 'cline task:review', tone: 'accent' },
       { prefix: '!', text: '3 files need attention', tone: 'dim' },
-      { prefix: '→', text: 'voicebox.speak({ profile: "Jarvis" })', tone: 'dim' },
+      { prefix: '→', text: 'kobevoice.speak({ profile: "Jarvis" })', tone: 'dim' },
     ],
     utterance: 'Review ready. Three files to look at.',
   },
@@ -195,14 +195,14 @@ function AgentSpeakStage({ scenario, cycleKey }: { scenario: Scenario; cycleKey:
 
 const MCP_CONFIG = `{
   "mcpServers": {
-    "voicebox": {
+    "kobevoice": {
       "url": "http://127.0.0.1:17493/mcp"
     }
   }
 }`;
 
 const SPEAK_EXAMPLE = `// In any MCP-aware agent:
-await voicebox.speak({
+await kobevoice.speak({
   text: "Deploy complete.",
   profile: "Morgan",
 })`;
@@ -217,7 +217,7 @@ function CodePanel() {
             01
           </span>
           <span className="text-[10px] font-mono text-ink-faint/70 uppercase tracking-wider">
-            Add Voicebox to your MCP config
+            Add Kobevoice to your MCP config
           </span>
         </div>
         <pre className="text-[11px] font-mono text-ink-dull leading-relaxed overflow-x-auto">
@@ -300,7 +300,7 @@ export function AgentIntegration() {
           </h2>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
             One tool call —{' '}
-            <code className="text-accent font-mono text-[0.9em]">voicebox.speak</code> —
+            <code className="text-accent font-mono text-[0.9em]">kobevoice.speak</code> —
             and any MCP-aware agent can talk to you in a voice you&rsquo;ve cloned. Claude Code,
             Cursor, Cline, or anything that speaks MCP.
           </p>

@@ -10,7 +10,7 @@ import {formatDate, getPost, loadAllPosts} from "@/lib/blog";
 
 export const size = {width: 1200, height: 630};
 export const contentType = "image/png";
-export const alt = "Voicebox Blog";
+export const alt = "Kobevoice Blog";
 
 // Pre-build an image for every post route (mirrors the page's static params).
 export function generateStaticParams() {
@@ -35,7 +35,7 @@ export default async function OgImage({
 }) {
 	const {slug} = await params;
 	const post = getPost(slug);
-	const title = post?.title ?? "Voicebox Blog";
+	const title = post?.title ?? "Kobevoice Blog";
 	const meta = post
 		? `${post.author} · ${formatDate(post.date)}`
 		: "Open source voice cloning. Local-first.";
@@ -68,7 +68,7 @@ export default async function OgImage({
 							color: "hsl(43, 60%, 58%)",
 						}}
 					>
-						Voicebox Blog
+						Kobevoice Blog
 					</div>
 				</div>
 

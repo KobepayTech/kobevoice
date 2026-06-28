@@ -1,9 +1,9 @@
 ---
 title: "Troubleshooting"
-description: "Common issues and solutions for Voicebox"
+description: "Common issues and solutions for Kobevoice"
 ---
 
-This guide covers common issues you might encounter when using or developing Voicebox, along with solutions.
+This guide covers common issues you might encounter when using or developing Kobevoice, along with solutions.
 
 ## Installation Issues
 
@@ -14,7 +14,7 @@ This occurs because the app isn't signed with an Apple Developer certificate.
 **Solution:**
 ```bash
 # Remove the quarantine attribute
-xattr -cr /Applications/Voicebox.app
+xattr -cr /Applications/Kobevoice.app
 ```
 
 ### Windows: SmartScreen Warning
@@ -33,8 +33,8 @@ Windows SmartScreen may warn that the app is unrecognized.
 
 **Solution:**
 ```bash
-chmod +x voicebox-*.AppImage
-./voicebox-*.AppImage
+chmod +x kobevoice-*.AppImage
+./kobevoice-*.AppImage
 ```
 
 ## Server Issues
@@ -74,7 +74,7 @@ chmod +x voicebox-*.AppImage
 
     ```bash
     # macOS/Linux
-    chmod +x ~/Library/Application\ Support/sh.voicebox.app/backend/voicebox-server
+    chmod +x ~/Library/Application\ Support/com.kobepaytech.kobevoice/backend/kobevoice-server
     ```
   </Accordion>
 
@@ -83,12 +83,12 @@ chmod +x voicebox-*.AppImage
 
     **macOS:**
     ```bash
-    tail -f ~/Library/Application\ Support/sh.voicebox.app/logs/server.log
+    tail -f ~/Library/Application\ Support/com.kobepaytech.kobevoice/logs/server.log
     ```
 
     **Windows:**
     ```bash
-    type %APPDATA%\sh.voicebox.app\logs\server.log
+    type %APPDATA%\com.kobepaytech.kobevoice\logs\server.log
     ```
   </Accordion>
 </AccordionGroup>
@@ -135,7 +135,7 @@ Please install flash-attn for faster inference.
     pip install https://github.com/kingbri1/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu128torch2.8.0cxx11abiFALSE-cp312-cp312-win_amd64.whl
     ```
 
-    Alternatively, run Voicebox's backend inside WSL2 and use the standard Linux wheels.
+    Alternatively, run Kobevoice's backend inside WSL2 and use the standard Linux wheels.
   </Accordion>
 </AccordionGroup>
 
@@ -210,7 +210,7 @@ This is expected behavior. The first generation downloads the selected TTS engin
     - Video editors
     - Multiple browser tabs with WebGL
 
-    Then restart Voicebox.
+    Then restart Kobevoice.
   </Accordion>
 
   <Accordion title="Use CPU Mode">
@@ -397,12 +397,12 @@ bun run tauri build
 - SQLite lock errors
 
 **Solutions:**
-- Close all Voicebox instances
+- Close all Kobevoice instances
 - Delete the lock file:
   ```bash
   # macOS
-  rm ~/Library/Application\ Support/sh.voicebox.app/data/voicebox.db-shm
-  rm ~/Library/Application\ Support/sh.voicebox.app/data/voicebox.db-wal
+  rm ~/Library/Application\ Support/com.kobepaytech.kobevoice/data/kobevoice.db-shm
+  rm ~/Library/Application\ Support/com.kobepaytech.kobevoice/data/kobevoice.db-wal
   ```
 
 ### Corrupted Database
@@ -419,10 +419,10 @@ bun run tauri build
 
 ```bash
 # macOS
-rm ~/Library/Application\ Support/sh.voicebox.app/data/voicebox.db
+rm ~/Library/Application\ Support/com.kobepaytech.kobevoice/data/kobevoice.db
 
 # Windows
-del %APPDATA%\sh.voicebox.app\data\voicebox.db
+del %APPDATA%\com.kobepaytech.kobevoice\data\kobevoice.db
 ```
 
 Restart the app to create a fresh database.
@@ -483,7 +483,7 @@ rmdir /s %USERPROFILE%\.cache\huggingface\hub\models--Qwen*
   </Accordion>
 
   <Accordion title="Check GPU Selection">
-    If you have multiple GPUs, ensure Voicebox is using the right one.
+    If you have multiple GPUs, ensure Kobevoice is using the right one.
 
     Settings → Generation → GPU Device
   </Accordion>
@@ -568,20 +568,20 @@ rmdir /s %USERPROFILE%\.cache\huggingface\hub\models--Qwen*
 
 If you're still experiencing problems:
 
-1. **Check GitHub Issues:** [github.com/jamiepine/voicebox/issues](https://github.com/jamiepine/voicebox/issues)
+1. **Check GitHub Issues:** [github.com/kobepaytech/kobevoice/issues](https://github.com/kobepaytech/kobevoice/issues)
 2. **Open a New Issue:** Provide:
    - Operating system and version
-   - Voicebox version
+   - Kobevoice version
    - Steps to reproduce
    - Error messages or logs
-3. **Join Discord:** [discord.gg/voicebox](https://discord.gg/voicebox) (coming soon)
+3. **Join Discord:** [discord.gg/kobevoice](https://discord.gg/kobevoice) (coming soon)
 
 ## Diagnostic Information
 
 When reporting issues, include this information:
 
 ```bash
-# Voicebox version
+# Kobevoice version
 # Check Help → About in the app
 
 # Operating system

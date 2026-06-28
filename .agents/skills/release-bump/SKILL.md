@@ -53,8 +53,8 @@ Finalize the changelog draft, bump the version across all tracked files, and cre
    - Add a new link for the new version
 
    ```markdown
-   [Unreleased]: https://github.com/jamiepine/voicebox/compare/vX.Y.Z...HEAD
-   [X.Y.Z]: https://github.com/jamiepine/voicebox/compare/vPREVIOUS...vX.Y.Z
+   [Unreleased]: https://github.com/kobepaytech/kobevoice/compare/vX.Y.Z...HEAD
+   [X.Y.Z]: https://github.com/kobepaytech/kobevoice/compare/vPREVIOUS...vX.Y.Z
    ```
 
 4. **Stage the changelog.**

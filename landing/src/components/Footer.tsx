@@ -18,13 +18,13 @@ export function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
               <Image
-                src="/voicebox-logo-app.webp"
-                alt="Voicebox"
+                src="/kobevoice-logo-app.webp"
+                alt="Kobevoice"
                 width={24}
                 height={24}
                 className="h-6 w-6"
               />
-              <span className="text-sm font-semibold">Voicebox</span>
+              <span className="text-sm font-semibold">Kobevoice</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Open source voice cloning studio. Local-first, free forever.
@@ -99,7 +99,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="https://docs.voicebox.sh"
+                  href="https://docs.kobevoice.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
@@ -195,7 +195,7 @@ export function Footer() {
 
         <div className="border-t border-border pt-6">
           <p className="text-center text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Voicebox. Open source under MIT license.
+            &copy; {new Date().getFullYear()} Kobevoice. Open source under MIT license.
           </p>
         </div>
       </div>

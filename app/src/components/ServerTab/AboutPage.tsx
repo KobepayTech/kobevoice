@@ -2,7 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import voiceboxLogo from '@/assets/voicebox-logo.png';
+import kobevoiceLogo from '@/assets/kobevoice-logo.png';
 import { usePlatform } from '@/platform/PlatformContext';
 
 function FadeIn({ delay = 0, children }: { delay?: number; children: ReactNode }) {
@@ -45,12 +45,12 @@ export function AboutPage() {
       <div className="max-w-md mx-auto h-full flex items-center">
         <div className="flex flex-col items-center text-center space-y-5">
           <FadeIn delay={0}>
-            <img src={voiceboxLogo} alt="Voicebox" className="w-20 h-20 object-contain" />
+            <img src={kobevoiceLogo} alt="Kobevoice" className="w-20 h-20 object-contain" />
           </FadeIn>
 
           <FadeIn delay={80}>
             <div className="space-y-1.5">
-              <h1 className="text-lg font-semibold">Voicebox</h1>
+              <h1 className="text-lg font-semibold">Kobevoice</h1>
               <p className="text-xs text-muted-foreground/60 h-4">
                 {version ? `v${version}` : '\u00A0'}
               </p>
@@ -67,7 +67,7 @@ export function AboutPage() {
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <span>{t('settings.about.createdBy')}</span>
               <a
-                href="https://github.com/jamiepine"
+                href="https://github.com/kobepaytech"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent hover:underline"
@@ -97,7 +97,7 @@ export function AboutPage() {
                 <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
               </a>
               <a
-                href="https://github.com/jamiepine/voicebox"
+                href="https://github.com/kobepaytech/kobevoice"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-lg border border-border/60 px-4 py-2 text-sm transition-colors hover:bg-muted/50"
@@ -124,7 +124,7 @@ export function AboutPage() {
                   link: (
                     // biome-ignore lint/a11y/useAnchorContent: Trans fills content at runtime
                     <a
-                      href="https://github.com/jamiepine/voicebox/blob/main/LICENSE"
+                      href="https://github.com/kobepaytech/kobevoice/blob/main/LICENSE"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:text-muted-foreground/60 transition-colors"

@@ -29,7 +29,7 @@ async def root():
     index = _frontend_dir / "index.html"
     if index.is_file():
         return FileResponse(index, media_type="text/html")
-    return {"message": "voicebox API", "version": __version__}
+    return {"message": "kobevoice API", "version": __version__}
 
 
 @router.post("/shutdown")
@@ -174,7 +174,7 @@ async def health():
         vram_used_mb=vram_used,
         backend_type=backend_type,
         backend_variant=os.environ.get(
-            "VOICEBOX_BACKEND_VARIANT",
+            "KOBEVOICE_BACKEND_VARIANT",
             "cuda" if torch.cuda.is_available() else ("xpu" if has_xpu else "cpu"),
         ),
         gpu_compatibility_warning=gpu_compat_warning,
@@ -201,7 +201,7 @@ async def filesystem_health():
         writable = False
         error = None
         if exists:
-            probe = dir_path / ".voicebox_probe"
+            probe = dir_path / ".kobevoice_probe"
             try:
                 probe.write_text("ok")
                 probe.unlink()

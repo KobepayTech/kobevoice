@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>voicebox</title>
+    <title>kobevoice</title>
     <script>
       (function () {
         try {
           var theme = 'system';
-          var raw = localStorage.getItem('voicebox-ui');
+          var raw = localStorage.getItem('kobevoice-ui');
           if (raw) {
             var parsed = JSON.parse(raw);
             if (parsed && parsed.state && parsed.state.theme) theme = parsed.state.theme;

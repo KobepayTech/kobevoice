@@ -30,7 +30,7 @@ This skill pairs with `draft-release-notes` and `release-bump`: triage first, th
 ```bash
 git worktree list  # check for stale ones first
 git worktree prune
-git worktree add ../voicebox-pr-review -b pr-review-<VERSION> main
+git worktree add ../kobevoice-pr-review -b pr-review-<VERSION> main
 ```
 
 Keep the main worktree for release-prep work (changelog drafts, direct-to-main follow-ups). Keep the review worktree for `gh pr checkout` — each checkout moves HEAD to a contributor branch, which you don't want to do in the main worktree.
@@ -121,7 +121,7 @@ For each PR in the tier-1 / tier-2 list:
 
 **a. Checkout in the review worktree:**
 ```bash
-cd ../voicebox-pr-review
+cd ../kobevoice-pr-review
 git checkout pr-review-<VERSION>  # reset to neutral base
 gh pr checkout <N>
 ```

@@ -1,5 +1,5 @@
 """
-Entry point for PyInstaller-bundled voicebox server.
+Entry point for PyInstaller-bundled kobevoice server.
 
 This module provides an entry point that works with PyInstaller by using
 absolute imports instead of relative imports.
@@ -44,7 +44,7 @@ if getattr(sys, 'frozen', False):
 # version check doesn't block for 30+ seconds loading torch etc.
 if "--version" in sys.argv:
     from backend import __version__
-    print(f"voicebox-server {__version__}")
+    print(f"kobevoice-server {__version__}")
     sys.exit(0)
 
 import logging
@@ -59,7 +59,7 @@ logger = logging.getLogger(__name__)
 
 # Log startup immediately to confirm binary execution
 logger.info("=" * 60)
-logger.info("voicebox-server starting up...")
+logger.info("kobevoice-server starting up...")
 logger.info(f"Python version: {sys.version}")
 logger.info(f"Executable: {sys.executable}")
 logger.info(f"Arguments: {sys.argv}")
@@ -225,7 +225,7 @@ def _start_parent_watchdog(parent_pid, data_dir=None):
 
 if __name__ == "__main__":
     try:
-        parser = argparse.ArgumentParser(description="voicebox backend server")
+        parser = argparse.ArgumentParser(description="kobevoice backend server")
         parser.add_argument(
             "--host",
             type=str,
@@ -261,14 +261,14 @@ if __name__ == "__main__":
             parser.error("--parent-pid must be a positive integer")
 
         # Detect backend variant from binary name
-        # voicebox-server-cuda → sets VOICEBOX_BACKEND_VARIANT=cuda
+        # kobevoice-server-cuda → sets KOBEVOICE_BACKEND_VARIANT=cuda
         import os
         binary_name = os.path.basename(sys.executable).lower()
         if "cuda" in binary_name:
-            os.environ["VOICEBOX_BACKEND_VARIANT"] = "cuda"
+            os.environ["KOBEVOICE_BACKEND_VARIANT"] = "cuda"
             logger.info("Backend variant: CUDA")
         else:
-            os.environ["VOICEBOX_BACKEND_VARIANT"] = "cpu"
+            os.environ["KOBEVOICE_BACKEND_VARIANT"] = "cpu"
             logger.info("Backend variant: CPU")
 
         # Register parent watchdog to start after server is fully ready

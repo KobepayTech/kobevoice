@@ -42,7 +42,7 @@ export function CaptureHero({
         >
           Hold a key anywhere on your machine, speak, release — your words land in the focused
           text field. A free, open-source, entirely-local alternative to{' '}
-          <b className="text-white">WisprFlow</b>. And because Voicebox clones voices too, any
+          <b className="text-white">WisprFlow</b>. And because Kobevoice clones voices too, any
           AI agent can speak back in a voice you own.
         </p>
 

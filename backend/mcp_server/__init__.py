@@ -1,4 +1,4 @@
-"""Model Context Protocol server — exposes Voicebox tools to local AI agents.
+"""Model Context Protocol server — exposes Kobevoice tools to local AI agents.
 
 Mounts a FastMCP instance at /mcp on the main FastAPI app (Streamable HTTP).
 A bundled stdio shim (backend/mcp_shim) forwards JSON-RPC into the same

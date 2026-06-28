@@ -36,7 +36,7 @@ export const useAudioChannelStore = create<AudioChannelStore>()(
         })),
     }),
     {
-      name: 'voicebox-audio-channels',
+      name: 'kobevoice-audio-channels',
     },
   ),
 );

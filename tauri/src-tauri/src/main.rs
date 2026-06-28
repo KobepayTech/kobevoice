@@ -35,7 +35,7 @@ fn build_dictate_window(app: &tauri::AppHandle) -> tauri::Result<tauri::WebviewW
         DICTATE_WINDOW_LABEL,
         WebviewUrl::App("?view=dictate".into()),
     )
-    .title("Voicebox Dictate")
+    .title("Kobevoice Dictate")
     .inner_size(DICTATE_WINDOW_WIDTH, DICTATE_WINDOW_HEIGHT)
     .decorations(false)
     .transparent(true)
@@ -119,15 +119,15 @@ pub fn show_dictate_window(app: &tauri::AppHandle) {
 const LEGACY_PORT: u16 = 8000;
 pub(crate) const SERVER_PORT: u16 = 17493;
 
-/// Find a voicebox-server process listening on a given port (Windows only).
+/// Find a kobevoice-server process listening on a given port (Windows only).
 ///
 /// Uses PowerShell `Get-NetTCPConnection` to look up the PID owning the port,
-/// then verifies via `tasklist` that it's a voicebox process. The caller is
+/// then verifies via `tasklist` that it's a kobevoice process. The caller is
 /// responsible for checking port occupancy first (e.g. `TcpStream::connect_timeout`).
 /// Replaces the previous `netstat -ano` approach which failed on systems with
 /// corrupted system DLLs (see #277).
 #[cfg(windows)]
-fn find_voicebox_pid_on_port(port: u16) -> Option<u32> {
+fn find_kobevoice_pid_on_port(port: u16) -> Option<u32> {
     use std::process::Command;
 
     // Use PowerShell's Get-NetTCPConnection to find the PID listening on the port.
@@ -143,13 +143,13 @@ fn find_voicebox_pid_on_port(port: u16) -> Option<u32> {
         let output_str = String::from_utf8_lossy(&output.stdout);
         for line in output_str.lines() {
             if let Ok(pid) = line.trim().parse::<u32>() {
-                // Verify this PID is a voicebox process
+                // Verify this PID is a kobevoice process
                 if let Ok(tasklist_output) = Command::new("tasklist")
                     .args(["/FI", &format!("PID eq {}", pid), "/FO", "CSV", "/NH"])
                     .output()
                 {
                     let tasklist_str = String::from_utf8_lossy(&tasklist_output.stdout);
-                    if tasklist_str.to_lowercase().contains("voicebox") {
+                    if tasklist_str.to_lowercase().contains("kobevoice") {
                         return Some(pid);
                     }
                 }
@@ -160,10 +160,10 @@ fn find_voicebox_pid_on_port(port: u16) -> Option<u32> {
     None
 }
 
-/// Check if a Voicebox server is responding on the given port.
+/// Check if a Kobevoice server is responding on the given port.
 ///
 /// Sends an HTTP GET to `/health` and returns `true` only if the response
-/// is valid JSON matching the Voicebox `HealthResponse` schema — specifically
+/// is valid JSON matching the Kobevoice `HealthResponse` schema — specifically
 /// `status` must be `"healthy"`, and both `model_loaded` and `gpu_available`
 /// must be present as booleans. This prevents misidentifying an unrelated
 /// service that happens to expose a `/health` endpoint.
@@ -179,7 +179,7 @@ fn check_health(port: u16) -> bool {
                 if !resp.status().is_success() {
                     return false;
                 }
-                // Parse as JSON and validate Voicebox-specific fields
+                // Parse as JSON and validate Kobevoice-specific fields
                 match resp.json::<serde_json::Value>() {
                     Ok(body) => {
                         body.get("status").and_then(|v| v.as_str()) == Some("healthy")
@@ -222,7 +222,7 @@ async fn start_server(
         return Ok(format!("http://127.0.0.1:{}", SERVER_PORT));
     }
 
-    // Check if a voicebox server is already running on our port (from previous session with keep_running=true,
+    // Check if a kobevoice server is already running on our port (from previous session with keep_running=true,
     // or an externally started server e.g. via `python`, `uvicorn`, Docker, etc.)
     #[cfg(unix)]
     {
@@ -237,25 +237,25 @@ async fn start_server(
                 if parts.len() >= 2 {
                     let command = parts[0];
                     let pid_str = parts[1];
-                    if command.contains("voicebox") {
+                    if command.contains("kobevoice") {
                         if let Ok(pid) = pid_str.parse::<u32>() {
-                            println!("Found existing voicebox-server on port {} (PID: {}), reusing it", SERVER_PORT, pid);
+                            println!("Found existing kobevoice-server on port {} (PID: {}), reusing it", SERVER_PORT, pid);
                             // Store the PID so we can kill it on exit if needed
                             *state.server_pid.lock().unwrap() = Some(pid);
                             return Ok(format!("http://127.0.0.1:{}", SERVER_PORT));
                         }
                     } else {
-                        // Process name doesn't contain "voicebox" — could be an external
+                        // Process name doesn't contain "kobevoice" — could be an external
                         // Python/uvicorn/Docker server. Verify via HTTP health check.
-                        println!("Port {} in use by '{}' (PID: {}), checking if it's a Voicebox server...", SERVER_PORT, command, pid_str);
+                        println!("Port {} in use by '{}' (PID: {}), checking if it's a Kobevoice server...", SERVER_PORT, command, pid_str);
                         if check_health(SERVER_PORT) {
                             println!("Health check passed — reusing external server on port {}", SERVER_PORT);
                             return Ok(format!("http://127.0.0.1:{}", SERVER_PORT));
                         }
-                        println!("Health check failed — port is occupied by a non-Voicebox process");
+                        println!("Health check failed — port is occupied by a non-Kobevoice process");
                         return Err(format!(
                             "Port {} is already in use by another application ({}). \
-                             Close it or change the Voicebox server port.",
+                             Close it or change the Kobevoice server port.",
                             SERVER_PORT, command
                         ));
                     }
@@ -271,28 +271,28 @@ async fn start_server(
             &format!("127.0.0.1:{}", SERVER_PORT).parse().unwrap(),
             std::time::Duration::from_secs(1),
         ).is_ok() {
-            // Port is in use — check if it's a voicebox process by name first
-            if let Some(pid) = find_voicebox_pid_on_port(SERVER_PORT) {
-                println!("Found existing voicebox-server on port {} (PID: {}), reusing it", SERVER_PORT, pid);
+            // Port is in use — check if it's a kobevoice process by name first
+            if let Some(pid) = find_kobevoice_pid_on_port(SERVER_PORT) {
+                println!("Found existing kobevoice-server on port {} (PID: {}), reusing it", SERVER_PORT, pid);
                 *state.server_pid.lock().unwrap() = Some(pid);
                 return Ok(format!("http://127.0.0.1:{}", SERVER_PORT));
             }
             // Process name doesn't match — could be an external Python/Docker server.
             // Verify via HTTP health check before giving up.
-            println!("Port {} in use by unknown process, checking if it's a Voicebox server...", SERVER_PORT);
+            println!("Port {} in use by unknown process, checking if it's a Kobevoice server...", SERVER_PORT);
             if check_health(SERVER_PORT) {
                 println!("Health check passed — reusing external server on port {}", SERVER_PORT);
                 return Ok(format!("http://127.0.0.1:{}", SERVER_PORT));
             }
             return Err(format!(
                 "Port {} is already in use by another application. \
-                 Close the other application or change the Voicebox port.",
+                 Close the other application or change the Kobevoice port.",
                 SERVER_PORT
             ));
         }
     }
 
-    // Kill any orphaned voicebox-server from previous session on legacy port 8000
+    // Kill any orphaned kobevoice-server from previous session on legacy port 8000
     // This handles upgrades from older versions that used a fixed port
     #[cfg(unix)]
     {
@@ -308,9 +308,9 @@ async fn start_server(
                     let command = parts[0];
                     let pid_str = parts[1];
                     
-                    if command.contains("voicebox") {
+                    if command.contains("kobevoice") {
                         if let Ok(pid) = pid_str.parse::<i32>() {
-                            println!("Found orphaned voicebox-server on legacy port {} (PID: {}, CMD: {}), killing it...", LEGACY_PORT, pid, command);
+                            println!("Found orphaned kobevoice-server on legacy port {} (PID: {}, CMD: {}), killing it...", LEGACY_PORT, pid, command);
                             let _ = Command::new("kill")
                                 .args(["-9", "--", &format!("-{}", pid)])
                                 .output();
@@ -319,7 +319,7 @@ async fn start_server(
                                 .output();
                         }
                     } else {
-                        println!("Legacy port {} is in use by non-voicebox process: {} (PID: {}), not killing", LEGACY_PORT, command, pid_str);
+                        println!("Legacy port {} is in use by non-kobevoice process: {} (PID: {}), not killing", LEGACY_PORT, command, pid_str);
                     }
                 }
             }
@@ -333,8 +333,8 @@ async fn start_server(
             &format!("127.0.0.1:{}", LEGACY_PORT).parse().unwrap(),
             std::time::Duration::from_secs(1),
         ).is_ok() {
-            if let Some(pid) = find_voicebox_pid_on_port(LEGACY_PORT) {
-                println!("Found orphaned voicebox-server on legacy port {} (PID: {}), killing it...", LEGACY_PORT, pid);
+            if let Some(pid) = find_kobevoice_pid_on_port(LEGACY_PORT) {
+                println!("Found orphaned kobevoice-server on legacy port {} (PID: {}), killing it...", LEGACY_PORT, pid);
                 let _ = std::process::Command::new("taskkill")
                     .args(["/PID", &pid.to_string(), "/T", "/F"])
                     .output();
@@ -356,7 +356,7 @@ async fn start_server(
         .map_err(|e| format!("Failed to create data dir: {}", e))?;
 
     println!("=================================================================");
-    println!("Starting voicebox-server sidecar");
+    println!("Starting kobevoice-server sidecar");
     println!("Data directory: {:?}", data_dir);
     println!("Remote mode: {}", remote.unwrap_or(false));
 
@@ -364,9 +364,9 @@ async fn start_server(
     let cuda_binary = {
         let cuda_dir = data_dir.join("backends").join("cuda");
         let cuda_name = if cfg!(windows) {
-            "voicebox-server-cuda.exe"
+            "kobevoice-server-cuda.exe"
         } else {
-            "voicebox-server-cuda"
+            "kobevoice-server-cuda"
         };
         let exe_path = cuda_dir.join(cuda_name);
         if exe_path.exists() {
@@ -381,7 +381,7 @@ async fn start_server(
                 .output()
             {
                 Ok(output) => {
-                    // Output format: "voicebox-server X.Y.Z\n"
+                    // Output format: "kobevoice-server X.Y.Z\n"
                     let version_str = String::from_utf8_lossy(&output.stdout);
                     let binary_version = version_str.trim().split_whitespace().last().unwrap_or("");
                     if binary_version == app_version {
@@ -412,7 +412,7 @@ async fn start_server(
         }
     };
 
-    let sidecar_result = app.shell().sidecar("voicebox-server");
+    let sidecar_result = app.shell().sidecar("kobevoice-server");
 
     let mut sidecar = match sidecar_result {
         Ok(s) => s,
@@ -478,7 +478,7 @@ async fn start_server(
             cmd = cmd.args(["--host", "0.0.0.0"]);
         }
         if let Some(ref dir) = effective_models_dir {
-            cmd = cmd.env("VOICEBOX_MODELS_DIR", dir);
+            cmd = cmd.env("KOBEVOICE_MODELS_DIR", dir);
         }
         cmd.spawn()
     } else {
@@ -488,7 +488,7 @@ async fn start_server(
             sidecar = sidecar.args(["--host", "0.0.0.0"]);
         }
         if let Some(ref dir) = effective_models_dir {
-            sidecar = sidecar.env("VOICEBOX_MODELS_DIR", dir);
+            sidecar = sidecar.env("KOBEVOICE_MODELS_DIR", dir);
         }
         println!("Spawning server process...");
         sidecar.spawn()
@@ -648,7 +648,7 @@ async fn start_server(
                 {
                     eprintln!("Server process ended unexpectedly during startup!");
                     eprintln!("The server binary may have crashed or exited with an error.");
-                    eprintln!("Check Console.app logs for more details (search for 'voicebox')");
+                    eprintln!("Check Console.app logs for more details (search for 'kobevoice')");
                     return Err("Server process ended unexpectedly".to_string());
                 }
             }
@@ -816,20 +816,20 @@ fn stop_audio_playback(
     state.stop_all_playback()
 }
 
-/// Identifier of the Voicebox app itself — used to short-circuit auto-paste
+/// Identifier of the Kobevoice app itself — used to short-circuit auto-paste
 /// when the user fires a chord while focus was inside one of our own
-/// windows. Paste into Voicebox-internal targets is step 6 territory and
+/// windows. Paste into Kobevoice-internal targets is step 6 territory and
 /// goes through a different (JS-side) injection path.
 ///
 /// Value matches what `focus_capture::capture_focus` writes into
 /// `FocusSnapshot::bundle_id` on the current platform — reverse-DNS bundle
 /// id on macOS, lowercased exe basename on Windows/Linux.
 #[cfg(target_os = "macos")]
-const VOICEBOX_BUNDLE_ID: &str = "sh.voicebox.app";
+const KOBEVOICE_BUNDLE_ID: &str = "com.kobepaytech.kobevoice";
 #[cfg(target_os = "windows")]
-const VOICEBOX_BUNDLE_ID: &str = "voicebox.exe";
+const KOBEVOICE_BUNDLE_ID: &str = "kobevoice.exe";
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
-const VOICEBOX_BUNDLE_ID: &str = "voicebox";
+const KOBEVOICE_BUNDLE_ID: &str = "kobevoice";
 
 /// Milliseconds to wait between activating the target app and firing the
 /// synthetic ⌘V, giving AppKit time to finish re-ordering windows and
@@ -909,7 +909,7 @@ fn build_chord_bindings(
 /// frontend invokes this both at startup (when `capture_settings.hotkey_enabled`
 /// is true) and from the settings toggle.
 ///
-/// On macOS this is the call that triggers the "Voicebox would like to receive
+/// On macOS this is the call that triggers the "Kobevoice would like to receive
 /// keystrokes from any application" TCC prompt, since keytap's `Tap` creates
 /// the CGEventTap inside `HotkeyMonitor::spawn`.
 #[cfg(desktop)]
@@ -1053,7 +1053,7 @@ fn open_input_monitoring_settings(app: tauri::AppHandle) -> Result<(), String> {
 /// clipboard stuck on the transcript.
 ///
 /// Skips (returns `false`) without touching anything when:
-/// - `focus.bundle_id` is Voicebox itself — step 6 will inject directly
+/// - `focus.bundle_id` is Kobevoice itself — step 6 will inject directly
 ///   into our own webview; pasting would just double-insert or miss the
 ///   real target.
 /// - Accessibility is not trusted — `CGEventPost` would silently drop the
@@ -1066,12 +1066,12 @@ async fn paste_final_text(
     text: String,
     focus: focus_capture::FocusSnapshot,
 ) -> Result<bool, String> {
-    if focus.bundle_id.as_deref() == Some(VOICEBOX_BUNDLE_ID) {
+    if focus.bundle_id.as_deref() == Some(KOBEVOICE_BUNDLE_ID) {
         return Ok(false);
     }
     if !accessibility::is_trusted() {
         return Err(
-            "Accessibility permission required for auto-paste. Open System Settings → Privacy & Security → Accessibility and enable Voicebox."
+            "Accessibility permission required for auto-paste. Open System Settings → Privacy & Security → Accessibility and enable Kobevoice."
                 .into(),
         );
     }
@@ -1093,7 +1093,7 @@ async fn paste_final_text(
         clipboard::restore_clipboard(&snapshot)?;
     } else {
         eprintln!(
-            "[voicebox] clipboard mutated during paste window — skipping restore to preserve newer content"
+            "[kobevoice] clipboard mutated during paste window — skipping restore to preserve newer content"
         );
     }
 
@@ -1122,7 +1122,7 @@ async fn debug_focus_roundtrip(
 ) -> Result<serde_json::Value, String> {
     if !accessibility::is_trusted() {
         return Err(
-            "Accessibility permission not granted. Open System Settings → Privacy & Security → Accessibility and enable Voicebox."
+            "Accessibility permission not granted. Open System Settings → Privacy & Security → Accessibility and enable Kobevoice."
                 .into(),
         );
     }
@@ -1169,7 +1169,7 @@ async fn debug_paste_text(
 ) -> Result<serde_json::Value, String> {
     if !accessibility::is_trusted() {
         return Err(
-            "Accessibility permission not granted. Open System Settings → Privacy & Security → Accessibility and enable Voicebox, then try again."
+            "Accessibility permission not granted. Open System Settings → Privacy & Security → Accessibility and enable Kobevoice, then try again."
                 .into(),
         );
     }
@@ -1266,7 +1266,7 @@ pub fn run() {
                 // finishes (rest-fade → hidden). `hide()` alone has been
                 // unreliable for transparent always-on-top windows on macOS
                 // — the NSWindow lingers as an invisible click target that
-                // steals focus to the Voicebox app when the user clicks
+                // steals focus to the Kobevoice app when the user clicks
                 // where it used to be. Park the window off-screen and mark
                 // it click-through as well, so even if `hide()` no-ops the
                 // user sees and interacts with nothing.
@@ -1279,7 +1279,7 @@ pub fn run() {
                     }
                 });
 
-                // Agent-initiated speech (voicebox.speak over MCP or POST /speak)
+                // Agent-initiated speech (kobevoice.speak over MCP or POST /speak)
                 // pops the pill up so the user can see what's coming out of their
                 // machine. The `dictate:show` listener is kept for any frontend
                 // caller that wants to force-surface the pill directly, but the

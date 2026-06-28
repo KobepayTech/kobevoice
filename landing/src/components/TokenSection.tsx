@@ -42,7 +42,7 @@ export function TokenSection() {
 					</h2>
 					<p className="text-muted-foreground max-w-2xl mx-auto">
 						The official {TOKEN_TICKER} token for supporters who want to back
-						the project and have some fun. Voicebox is and always will be{" "}
+						the project and have some fun. Kobevoice is and always will be{" "}
 						<b className="text-foreground">free and open source</b> — the token
 						is entirely optional and not required to use anything here.
 					</p>

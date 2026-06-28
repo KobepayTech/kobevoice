@@ -32,7 +32,7 @@ i18n
     react: { useSuspense: false },
     detection: {
       order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'voicebox:lang',
+      lookupLocalStorage: 'kobevoice:lang',
       caches: ['localStorage'],
     },
   });

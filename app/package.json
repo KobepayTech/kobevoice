@@ -1,5 +1,5 @@
 {
-  "name": "@voicebox/app",
+  "name": "@kobevoice/app",
   "version": "0.5.0",
   "private": true,
   "type": "module",

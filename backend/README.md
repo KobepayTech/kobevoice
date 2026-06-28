@@ -1,4 +1,4 @@
-# Voicebox Backend
+# Kobevoice Backend
 
 FastAPI server powering voice cloning, speech generation, and audio processing. Runs locally as a Tauri sidecar or standalone via `python -m backend.main`.
 
@@ -111,14 +111,14 @@ curl http://localhost:17493/generate/{id}/status
 
 ```
 {data_dir}/
-  voicebox.db             # SQLite database
+  kobevoice.db             # SQLite database
   profiles/{id}/          # Voice samples per profile
   generations/            # Generated audio files
   cache/                  # Voice prompt cache (memory + disk)
   backends/               # Downloaded CUDA binary (if applicable)
 ```
 
-Default location is the OS-specific app data directory. Override with `--data-dir` or the `VOICEBOX_DATA_DIR` environment variable.
+Default location is the OS-specific app data directory. Override with `--data-dir` or the `KOBEVOICE_DATA_DIR` environment variable.
 
 ## Code quality
 

@@ -18,7 +18,7 @@ const TUTORIALS: (Tutorial | null)[] = [
 	},
 	{
 		id: "woQe90k7g3c",
-		title: "NEW Voicebox DESTROYS ElevenLabs?",
+		title: "NEW Kobevoice DESTROYS ElevenLabs?",
 		author: "Julian Goldie SEO",
 		thumbnail: "/tutorials/woQe90k7g3c.jpg",
 	},
@@ -30,13 +30,13 @@ const TUTORIALS: (Tutorial | null)[] = [
 	},
 	{
 		id: "05YBqrWTLQ0",
-		title: "2026年最好的声音克隆工具？Voicebox完整测评：从下载到API调用，附速度对比",
+		title: "2026年最好的声音克隆工具？Kobevoice完整测评：从下载到API调用，附速度对比",
 		author: "Tech指南",
 		thumbnail: "/tutorials/05YBqrWTLQ0.jpg",
 	},
 	{
 		id: "RRRBxNXgeKQ",
-		title: "Get Started with Voicebox: Open-Source Alternative to ElevenLabs Tutorial",
+		title: "Get Started with Kobevoice: Open-Source Alternative to ElevenLabs Tutorial",
 		author: "StinkyScrublet",
 		thumbnail: "/tutorials/RRRBxNXgeKQ.jpg",
 	},

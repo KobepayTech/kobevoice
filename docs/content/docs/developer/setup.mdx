@@ -1,6 +1,6 @@
 ---
 title: "Development Setup"
-description: "Set up your local development environment for Voicebox"
+description: "Set up your local development environment for Kobevoice"
 ---
 
 ## Quick Setup (Recommended)
@@ -9,8 +9,8 @@ Get started in two commands:
 
 ```bash
 # Clone and enter the repository
-git clone https://github.com/jamiepine/voicebox.git
-cd voicebox
+git clone https://github.com/kobepaytech/kobevoice.git
+cd kobevoice
 
 # Setup everything (Python venv, JS deps, dev sidecar)
 just setup
@@ -86,7 +86,7 @@ Run `just --list` to see all available commands. Highlights:
 | `just build` | CPU server binary + Tauri installer |
 | `just build-local` | **Windows:** CPU + CUDA server binaries + Tauri installer |
 | `just build-server` | CPU server binary only |
-| `just build-server-cuda` | **Windows:** CUDA server binary only, placed in `%APPDATA%/sh.voicebox.app/backends/cuda` for local testing |
+| `just build-server-cuda` | **Windows:** CUDA server binary only, placed in `%APPDATA%/com.kobepaytech.kobevoice/backends/cuda` for local testing |
 | `just build-tauri` | Tauri app only |
 | `just build-web` | Web app only |
 
@@ -121,7 +121,7 @@ Run `just --list` to see all available commands. Highlights:
 ## Project Structure
 
 <Files>
-  <Folder name="voicebox" defaultOpen>
+  <Folder name="kobevoice" defaultOpen>
     <Folder name="app">
       <Folder name="src">
         <File name="components/" />

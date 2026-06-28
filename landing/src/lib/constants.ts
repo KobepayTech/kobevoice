@@ -1,15 +1,15 @@
-// Download links for voicebox releases
+// Download links for kobevoice releases
 // These are fallback values - link to releases page if API fails
 export const LATEST_VERSION = 'v0.1.0';
 
-export const GITHUB_REPO = 'https://github.com/jamiepine/voicebox';
+export const GITHUB_REPO = 'https://github.com/kobepaytech/kobevoice';
 export const GITHUB_RELEASES_PAGE = `${GITHUB_REPO}/releases`;
 export const DONATE_URL = 'https://buymeacoffee.com/jamiepine';
 export const SPONSOR_CHECKOUT_URL = 'https://buy.stripe.com/eVqdRad3n16ubcqf201Jm00';
 export const SPONSOR_CONTACT_EMAIL = 'jamie@spacedrive.com';
 
-// $VOICEBOX — the official community token on Solana
-export const TOKEN_TICKER = '$VOICEBOX';
+// $KOBEVOICE — the official community token on Solana
+export const TOKEN_TICKER = '$KOBEVOICE';
 export const TOKEN_CONTRACT_ADDRESS = 'FpzZHtp5tbvz6xndEtoJHoGEWcT7cFEuscdCh9RApump';
 export const TOKEN_PUMP_URL = `https://pump.fun/coin/${TOKEN_CONTRACT_ADDRESS}`;
 // Solscan token page — lets anyone inspect supply, holders, and history.
@@ -40,7 +40,7 @@ export const TOKEN_PROOFS: TokenProof[] = [
     kind: 'burn',
     label: 'Buyback & burn',
     detail:
-      'Bought $VOICEBOX back from the open market and burned it to a dead address, permanently removing it from supply.',
+      'Bought $KOBEVOICE back from the open market and burned it to a dead address, permanently removing it from supply.',
     txUrl:
       'https://solscan.io/tx/5MjK4CYMBKAewLcjdD6QkM8ctkeG2bjyQhpjNgEumkDbDtoKCVmzKcWwLWsd4QJov8hs5zbGLt3g5vVCp4CBmze5',
   },

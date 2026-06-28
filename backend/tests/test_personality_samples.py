@@ -204,7 +204,7 @@ def detect_backend_port(hint: Optional[int]) -> int:
         except Exception:
             continue
     raise SystemExit(
-        "No running Voicebox backend found. Start it (`python backend/main.py`) "
+        "No running Kobevoice backend found. Start it (`python backend/main.py`) "
         f"or pass --port. Tried: {candidates}"
     )
 

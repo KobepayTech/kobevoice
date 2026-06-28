@@ -97,7 +97,7 @@ export default function CapturePage() {
         <div className="mx-auto max-w-4xl px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl mb-4">
-              Install Voicebox, start dictating.
+              Install Kobevoice, start dictating.
             </h2>
             <p className="text-muted-foreground">
               Free, open-source, local. No account, no API keys, no per-character fees.
@@ -164,7 +164,7 @@ export default function CapturePage() {
               href="/"
               className="text-sm text-muted-foreground/70 hover:text-foreground transition-colors"
             >
-              ← See everything Voicebox can do
+              ← See everything Kobevoice can do
             </a>
           </div>
         </div>

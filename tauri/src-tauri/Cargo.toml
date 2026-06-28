@@ -1,5 +1,5 @@
 [package]
-name = "voicebox"
+name = "kobevoice"
 version = "0.5.0"
 description = "A production-quality desktop app for Qwen3-TTS voice cloning and generation"
 authors = ["you"]

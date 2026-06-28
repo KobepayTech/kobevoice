@@ -2,7 +2,7 @@
 CUDA backend download, assembly, and verification.
 
 Downloads two archives from GitHub Releases:
-  1. Server core (voicebox-server-cuda.tar.gz) — the exe + non-NVIDIA deps,
+  1. Server core (kobevoice-server-cuda.tar.gz) — the exe + non-NVIDIA deps,
      versioned with the app.
   2. CUDA libs (cuda-libs-{version}.tar.gz) — NVIDIA runtime libraries,
      versioned independently (only redownloaded on CUDA toolkit bump).
@@ -27,7 +27,7 @@ from .. import __version__
 
 logger = logging.getLogger(__name__)
 
-GITHUB_RELEASES_URL = "https://github.com/jamiepine/voicebox/releases/download"
+GITHUB_RELEASES_URL = "https://github.com/kobepaytech/kobevoice/releases/download"
 
 PROGRESS_KEY = "cuda-backend"
 
@@ -59,8 +59,8 @@ def get_cuda_dir() -> Path:
 def get_cuda_exe_name() -> str:
     """Platform-specific CUDA executable filename."""
     if sys.platform == "win32":
-        return "voicebox-server-cuda.exe"
-    return "voicebox-server-cuda"
+        return "kobevoice-server-cuda.exe"
+    return "kobevoice-server-cuda"
 
 
 def get_cuda_binary_path() -> Optional[Path]:
@@ -94,7 +94,7 @@ def is_cuda_active() -> bool:
 
     The CUDA binary sets this env var on startup (see server.py).
     """
-    return os.environ.get("VOICEBOX_BACKEND_VARIANT") == "cuda"
+    return os.environ.get("KOBEVOICE_BACKEND_VARIANT") == "cuda"
 
 
 def get_cuda_status() -> dict:
@@ -286,7 +286,7 @@ async def _download_cuda_binary_locked(version: Optional[str] = None):
     )
 
     base_url = f"{GITHUB_RELEASES_URL}/{version}"
-    server_archive = "voicebox-server-cuda.tar.gz"
+    server_archive = "kobevoice-server-cuda.tar.gz"
     libs_archive = f"cuda-libs-{CUDA_LIBS_VERSION}.tar.gz"
 
     try:
@@ -368,9 +368,9 @@ def get_cuda_binary_version() -> Optional[str]:
             timeout=30,
             cwd=str(cuda_path.parent),  # Run from the onedir directory
         )
-        # Output format: "voicebox-server 0.3.0"
+        # Output format: "kobevoice-server 0.3.0"
         for line in result.stdout.strip().splitlines():
-            if "voicebox-server" in line:
+            if "kobevoice-server" in line:
                 return line.split()[-1]
     except Exception as e:
         logger.warning(f"Could not get CUDA binary version: {e}")

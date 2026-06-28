@@ -5,13 +5,13 @@ description: "Let Claude Code, Cursor, Cline, or any MCP-aware agent speak in on
 
 ## Overview
 
-Voicebox ships a built-in **Model Context Protocol** server so local AI
-agents can call your Voicebox install directly: speak text in a voice
+Kobevoice ships a built-in **Model Context Protocol** server so local AI
+agents can call your Kobevoice install directly: speak text in a voice
 profile, transcribe audio, and list captures or profiles. The server runs
-inside the same process as the rest of Voicebox and is mounted at `/mcp`
+inside the same process as the rest of Kobevoice and is mounted at `/mcp`
 over Streamable HTTP.
 
-Agent asks to speak → Voicebox plays audio on your speakers → an on-screen
+Agent asks to speak → Kobevoice plays audio on your speakers → an on-screen
 pill surfaces the voice name for the whole duration so you always see what's
 coming out of your machine.
 
@@ -28,10 +28,10 @@ coming out of your machine.
 ### Claude Code
 
 ```
-claude mcp add voicebox \
+claude mcp add kobevoice \
   --transport http \
   --url http://127.0.0.1:17493/mcp \
-  --header "X-Voicebox-Client-Id: claude-code"
+  --header "X-Kobevoice-Client-Id: claude-code"
 ```
 
 ### Cursor / Windsurf / VS Code MCP / any HTTP MCP client
@@ -41,21 +41,21 @@ Drop this into the client's MCP config (usually `.mcp.json` or a Settings UI):
 ```json
 {
   "mcpServers": {
-    "voicebox": {
+    "kobevoice": {
       "url": "http://127.0.0.1:17493/mcp",
-      "headers": { "X-Voicebox-Client-Id": "cursor" }
+      "headers": { "X-Kobevoice-Client-Id": "cursor" }
     }
   }
 }
 ```
 
 Change `cursor` to whatever name you want the binding to show up as in
-Voicebox → Settings → MCP. The value is just an identifier for the
+Kobevoice → Settings → MCP. The value is just an identifier for the
 per-client voice binding — not a secret, not a credential.
 
 ### Clients that only speak stdio
 
-A stdio shim binary `voicebox-mcp` is bundled with the desktop app. Point
+A stdio shim binary `kobevoice-mcp` is bundled with the desktop app. Point
 the client at that binary's absolute path:
 
 <Tabs items={["macOS", "Windows", "Linux"]}>
@@ -63,9 +63,9 @@ the client at that binary's absolute path:
   ```json
   {
     "mcpServers": {
-      "voicebox": {
-        "command": "/Applications/Voicebox.app/Contents/MacOS/voicebox-mcp",
-        "env": { "VOICEBOX_CLIENT_ID": "claude-desktop" }
+      "kobevoice": {
+        "command": "/Applications/Kobevoice.app/Contents/MacOS/kobevoice-mcp",
+        "env": { "KOBEVOICE_CLIENT_ID": "claude-desktop" }
       }
     }
   }
@@ -75,9 +75,9 @@ the client at that binary's absolute path:
   ```json
   {
     "mcpServers": {
-      "voicebox": {
-        "command": "C:\\Program Files\\Voicebox\\voicebox-mcp.exe",
-        "env": { "VOICEBOX_CLIENT_ID": "claude-desktop" }
+      "kobevoice": {
+        "command": "C:\\Program Files\\Kobevoice\\kobevoice-mcp.exe",
+        "env": { "KOBEVOICE_CLIENT_ID": "claude-desktop" }
       }
     }
   }
@@ -87,9 +87,9 @@ the client at that binary's absolute path:
   ```json
   {
     "mcpServers": {
-      "voicebox": {
-        "command": "/opt/voicebox/voicebox-mcp",
-        "env": { "VOICEBOX_CLIENT_ID": "claude-desktop" }
+      "kobevoice": {
+        "command": "/opt/kobevoice/kobevoice-mcp",
+        "env": { "KOBEVOICE_CLIENT_ID": "claude-desktop" }
       }
     }
   }
@@ -97,23 +97,23 @@ the client at that binary's absolute path:
   </Tab>
 </Tabs>
 
-The shim waits up to 30 seconds for the Voicebox backend to come up, then
-proxies JSON-RPC from stdio over Streamable HTTP. Voicebox must be running
+The shim waits up to 30 seconds for the Kobevoice backend to come up, then
+proxies JSON-RPC from stdio over Streamable HTTP. Kobevoice must be running
 for the shim to connect.
 
 ## Tools
 
 | Tool | Use |
 |---|---|
-| `voicebox.speak` | Speak text in a voice profile. Returns a `generation_id` to poll. |
-| `voicebox.transcribe` | Whisper transcription of base64 audio or an absolute local path. |
-| `voicebox.list_captures` | Recent captures with transcripts, paginated. |
-| `voicebox.list_profiles` | Available voice profiles (cloned + preset). |
+| `kobevoice.speak` | Speak text in a voice profile. Returns a `generation_id` to poll. |
+| `kobevoice.transcribe` | Whisper transcription of base64 audio or an absolute local path. |
+| `kobevoice.list_captures` | Recent captures with transcripts, paginated. |
+| `kobevoice.list_profiles` | Available voice profiles (cloned + preset). |
 
-### `voicebox.speak`
+### `kobevoice.speak`
 
 ```ts
-voicebox.speak({
+kobevoice.speak({
   text: "Deploy complete.",
   profile?: "Morgan",            // name or id; falls back to per-client binding, then default
   engine?: "qwen",               // qwen | qwen_custom_voice | luxtts | chatterbox | chatterbox_turbo | tada | kokoro
@@ -138,10 +138,10 @@ Returns:
 - **Persona mode** — `personality: true` and the profile must have a personality prompt set.
   The LLM rewrites the text in character before TTS. See [Voice Personalities](/overview/voice-personalities).
 
-### `voicebox.transcribe`
+### `kobevoice.transcribe`
 
 ```ts
-voicebox.transcribe({
+kobevoice.transcribe({
   audio_base64?: "<base64>",    // exactly one of these two
   audio_path?: "/absolute/path/to/file.wav",
   language?: "en",
@@ -151,18 +151,18 @@ voicebox.transcribe({
 
 Returns `{ text, duration, language, model }`. 200 MB ceiling on either path.
 
-### `voicebox.list_captures`
+### `kobevoice.list_captures`
 
 `{ limit?: 20, offset?: 0 }` → `{ captures: [...], total }`. `limit` is
 clamped to `1..=200`.
 
-### `voicebox.list_profiles`
+### `kobevoice.list_profiles`
 
 No args → `{ profiles: [{ id, name, voice_type, language, has_personality }] }`.
 
 ## Voice resolution
 
-Every call to `voicebox.speak` (and `POST /speak`) resolves the voice profile
+Every call to `kobevoice.speak` (and `POST /speak`) resolves the voice profile
 in this order:
 
 <Steps>
@@ -171,8 +171,8 @@ in this order:
     the call errors — the server doesn't silently fall back.
   </Step>
   <Step title="Per-client binding">
-    Looked up by the `X-Voicebox-Client-Id` header. Managed in
-    **Voicebox → Settings → MCP**. Lets you pin Claude Code to Morgan,
+    Looked up by the `X-Kobevoice-Client-Id` header. Managed in
+    **Kobevoice → Settings → MCP**. Lets you pin Claude Code to Morgan,
     Cursor to Scarlett, etc.
   </Step>
   <Step title="Global default">
@@ -186,7 +186,7 @@ pointing at Settings.
 
 ## Per-client bindings
 
-Voicebox → Settings → MCP shows one row per `client_id` Voicebox has heard
+Kobevoice → Settings → MCP shows one row per `client_id` Kobevoice has heard
 from, plus the config snippets you can copy into each agent. Each row
 carries:
 
@@ -195,7 +195,7 @@ carries:
 | `label` | Display name in the Settings UI (e.g. "Claude Code"). |
 | `profile_id` | The voice this client uses when `profile` isn't passed. |
 | `default_engine` | Override the TTS engine for this client. |
-| `default_personality` | When true, `voicebox.speak` routes through the profile's personality LLM (rewrite) by default. |
+| `default_personality` | When true, `kobevoice.speak` routes through the profile's personality LLM (rewrite) by default. |
 | `last_seen_at` | Last time the server saw a request from this client. |
 
 `last_seen_at` is stamped automatically by middleware on every `/mcp/*`
@@ -206,7 +206,7 @@ request — useful when you're not sure whether your config took.
 Every agent-initiated speak surfaces the floating pill the same way
 [Dictation](/overview/dictation) does, in a new `Speaking` state showing the
 profile name and an elapsed timer. The pill is intentionally unmissable —
-silent background TTS is a trust hazard, so Voicebox always shows what's
+silent background TTS is a trust hazard, so Kobevoice always shows what's
 being spoken and in what voice.
 
 Behind the scenes, the backend broadcasts `speak-start` and `speak-end`
@@ -222,7 +222,7 @@ don't speak MCP — shell scripts, ACP, A2A, GitHub Actions, whatever.
 ```bash
 curl -X POST http://127.0.0.1:17493/speak \
   -H 'Content-Type: application/json' \
-  -H 'X-Voicebox-Client-Id: ci' \
+  -H 'X-Kobevoice-Client-Id: ci' \
   -d '{"text":"Build complete.","profile":"Morgan"}'
 ```
 
@@ -239,13 +239,13 @@ agent:
 npx @modelcontextprotocol/inspector http://127.0.0.1:17493/mcp
 ```
 
-Start with `voicebox.list_profiles` to confirm wiring, then
-`voicebox.speak` for end-to-end — you should hear audio and see the
+Start with `kobevoice.list_profiles` to confirm wiring, then
+`kobevoice.speak` for end-to-end — you should hear audio and see the
 generation land in the Captures tab.
 
 <Callout type="info">
   If an agent can't reach the server, the first thing to check is that
-  Voicebox is running — the backend only listens while the desktop app is
+  Kobevoice is running — the backend only listens while the desktop app is
   open. The stdio shim surfaces this as a JSON-RPC error on the client
   side after its 30-second health-wait window elapses.
 </Callout>
@@ -253,16 +253,16 @@ generation land in the Captures tab.
 ## Security
 
 - **Localhost only.** The server binds to `127.0.0.1`. If you ever point
-  Voicebox at a non-loopback interface (e.g. remote-mode over a trusted
+  Kobevoice at a non-loopback interface (e.g. remote-mode over a trusted
   network), add a bearer token — it's on the roadmap but not in 0.5.0.
 - **No auth today.** Any process that can connect to your loopback can
-  call MCP. That's the same trust boundary as the rest of Voicebox's REST
+  call MCP. That's the same trust boundary as the rest of Kobevoice's REST
   API and is appropriate for a single-user local tool.
 - **`audio_path` reads are unrestricted** against the same trust
   boundary. If you're scripting against a shared host, prefer
   `audio_base64` so you don't have to think about path sandboxing.
 - **Voice cloning consent applies.** See [Voice Cloning](/overview/voice-cloning#limitations)
-  — an agent being able to call `voicebox.speak` in someone's voice
+  — an agent being able to call `kobevoice.speak` in someone's voice
   doesn't change the ethics of whose voices you clone.
 
 ## Implementation notes
@@ -275,7 +275,7 @@ generation land in the Captures tab.
 - **Dependencies:** `fastmcp>=3.0,<4.0`, `sse-starlette>=2.0`.
 - **Lifespan:** mounting FastMCP requires the `lifespan=` kwarg on
   `FastAPI()` — the startup/shutdown event decorators are incompatible
-  with FastMCP's Streamable HTTP session manager. The Voicebox app.py
+  with FastMCP's Streamable HTTP session manager. The Kobevoice app.py
   composes both into one async context manager.
 
 For the full developer-facing tour of the code layout, see

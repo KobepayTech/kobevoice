@@ -1,6 +1,6 @@
 import { RouterProvider } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
-import voiceboxLogo from '@/assets/voicebox-logo.png';
+import kobevoiceLogo from '@/assets/kobevoice-logo.png';
 import { DictateWindow } from '@/components/DictateWindow/DictateWindow';
 import ShinyText from '@/components/ShinyText';
 import { TitleBarDragRegion } from '@/components/TitleBarDragRegion';
@@ -16,7 +16,7 @@ import { router } from '@/router';
 import { useLogStore } from '@/stores/logStore';
 import {
   getDefaultServerUrl,
-  isLoopbackVoiceboxServerUrl,
+  isLoopbackKobevoiceServerUrl,
   useServerStore,
 } from '@/stores/serverStore';
 
@@ -26,10 +26,10 @@ function isDictateView(): boolean {
 }
 
 /**
- * Validate that a health response has the expected Voicebox-specific shape.
+ * Validate that a health response has the expected Kobevoice-specific shape.
  * Prevents misidentifying an unrelated service on the same port.
  */
-function isVoiceboxHealthResponse(health: HealthResponse): boolean {
+function isKobevoiceHealthResponse(health: HealthResponse): boolean {
   return (
     health?.status === 'healthy' &&
     typeof health.model_loaded === 'boolean' &&
@@ -136,7 +136,7 @@ function MainApp() {
     if (!platform.metadata.isTauri) {
       const serverUrl = getDefaultServerUrl();
       const currentServerUrl = useServerStore.getState().serverUrl;
-      if (currentServerUrl !== serverUrl && isLoopbackVoiceboxServerUrl(currentServerUrl)) {
+      if (currentServerUrl !== serverUrl && isLoopbackKobevoiceServerUrl(currentServerUrl)) {
         useServerStore.getState().setServerUrl(serverUrl);
       }
       setServerReady(true); // Web assumes server is running
@@ -155,7 +155,7 @@ function MainApp() {
       console.log('Dev mode: Skipping auto-start of server (run it separately)');
       setServerReady(true); // Mark as ready so UI doesn't show loading screen
       // Mark that server was not started by app (so we don't try to stop it on close)
-      window.__voiceboxServerStartedByApp = false;
+      window.__kobevoiceServerStartedByApp = false;
       return;
     }
 
@@ -177,12 +177,12 @@ function MainApp() {
         useServerStore.getState().setServerUrl(serverUrl);
         setServerReady(true);
         // Mark that we started the server (so we know to stop it on close)
-        window.__voiceboxServerStartedByApp = true;
+        window.__kobevoiceServerStartedByApp = true;
       })
       .catch((error) => {
         console.error('Failed to auto-start server:', error);
         serverStartingRef.current = false;
-        window.__voiceboxServerStartedByApp = false;
+        window.__kobevoiceServerStartedByApp = false;
 
         // Only fall back to health-check polling when the error indicates the
         // port is occupied (likely an external server). For real failures
@@ -196,17 +196,17 @@ function MainApp() {
 
         // Fall back to polling: the server may already be running externally
         // (e.g. started via python/uvicorn/Docker). Poll the health endpoint
-        // until it responds with a valid Voicebox payload, then transition to
+        // until it responds with a valid Kobevoice payload, then transition to
         // the main UI.
         console.log('Falling back to health-check polling...');
         const pollInterval = setInterval(async () => {
           try {
             const health = await apiClient.getHealth();
-            if (!isVoiceboxHealthResponse(health)) {
-              console.log('Health response is not from a Voicebox server, keep polling...');
+            if (!isKobevoiceHealthResponse(health)) {
+              console.log('Health response is not from a Kobevoice server, keep polling...');
               return;
             }
-            console.log('External Voicebox server detected via health check');
+            console.log('External Kobevoice server detected via health check');
             clearInterval(pollInterval);
             setServerReady(true);
           } catch {
@@ -219,7 +219,7 @@ function MainApp() {
           clearInterval(pollInterval);
           serverStartingRef.current = false;
           setStartupError(
-            'Could not connect to a Voicebox server within 2 minutes. ' +
+            'Could not connect to a Kobevoice server within 2 minutes. ' +
               'Please check that the server is running and try again.',
           );
         }, 120_000);
@@ -264,8 +264,8 @@ function MainApp() {
               <div className="w-48 h-48 rounded-full bg-accent/20 blur-3xl" />
             </div>
             <img
-              src={voiceboxLogo}
-              alt="Voicebox"
+              src={kobevoiceLogo}
+              alt="Kobevoice"
               className="w-48 h-48 object-contain animate-fade-in-scale relative z-10"
             />
           </div>

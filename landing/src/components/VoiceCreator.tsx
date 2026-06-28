@@ -388,7 +388,7 @@ export function VoiceCreator() {
             </h2>
             <p className="text-muted-foreground mb-6">
               Three ways to get a sample in. Upload a clip, record from your microphone, or
-              capture audio playing on your system. Voicebox clones the voice from as little as 3
+              capture audio playing on your system. Kobevoice clones the voice from as little as 3
               seconds of audio.
             </p>
             <div className="space-y-3">

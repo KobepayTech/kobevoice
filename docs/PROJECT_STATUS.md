@@ -1,4 +1,4 @@
-# Voicebox Project Status & Roadmap
+# Kobevoice Project Status & Roadmap
 
 > Last updated: 2026-06-27 | Current version: **v0.5.0** | 402 open issues | 88 open PRs | 1.3M downloads · 34.8k stars
 
@@ -110,7 +110,7 @@ POST /generate
 - MCP rough edges — dotted tool names violate Claude Desktop's name pattern (#790), audio scrambled over MCP (#780).
 - Refinement silently translates non-English transcripts to English (#603).
 
-**Funding model — `$VOICEBOX` token (#806):** the two-month gap was a solo-dev decision about long-term sustainability, not neglect or a compromise. `$VOICEBOX` (Solana) is the **official, dev-controlled** token and the chosen revenue path — donations/sponsors didn't cover full-time work. The app stays 100% free, open-source, local-first, no subscriptions. Dev supply is being bought back and burned (done twice), liquidity locked. It has funded ~2–3 months of full-time work, so the cadence resumes this week. The #806 thread was a community concern, addressed transparently and resolved amicably; keep an eye out for actual impersonator/community tokens, which are a separate thing.
+**Funding model — `$KOBEVOICE` token (#806):** the two-month gap was a solo-dev decision about long-term sustainability, not neglect or a compromise. `$KOBEVOICE` (Solana) is the **official, dev-controlled** token and the chosen revenue path — donations/sponsors didn't cover full-time work. The app stays 100% free, open-source, local-first, no subscriptions. Dev supply is being bought back and burned (done twice), liquidity locked. It has funded ~2–3 months of full-time work, so the cadence resumes this week. The #806 thread was a community concern, addressed transparently and resolved amicably; keep an eye out for actual impersonator/community tokens, which are a separate thing.
 
 **Other trust/security signals:** macOS malware-flag reports continue (#369); a DNS-rebinding / Host-header exposure on the local API+MCP server was reported with fixes attached (#778).
 
@@ -118,10 +118,10 @@ POST /generate
 
 ### What's Shipped (v0.5.0 — the Capture release)
 
-Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a full voice studio — dictation in, agent speech out, a local LLM in the middle.
+Shipped 2026-04-25 (PR #544). Kobevoice went from a voice-cloning studio to a full voice studio — dictation in, agent speech out, a local LLM in the middle.
 
 - **Dictation** — global hotkey capture (push-to-talk + toggle chords), on-screen pill with live state, auto-paste into the focused field with clipboard save/restore, chord-picker UI. Scoped Accessibility permission (transcripts still land if paste is denied).
-- **MCP server** at `http://127.0.0.1:17493/mcp` — `voicebox.speak` / `.transcribe` / `.list_captures` / `.list_profiles`. Streamable HTTP primary transport, stdio sidecar shim, per-client voice binding via `X-Voicebox-Client-Id`. Speaking pill always shows agent-initiated output.
+- **MCP server** at `http://127.0.0.1:17493/mcp` — `kobevoice.speak` / `.transcribe` / `.list_captures` / `.list_profiles`. Streamable HTTP primary transport, stdio sidecar shim, per-client voice binding via `X-Kobevoice-Client-Id`. Speaking pill always shows agent-initiated output.
 - **Personality** — voice profiles carry an optional ≤2000-char persona. Compose (shuffle an in-character line) and Speak-in-character (rewrite input before TTS), both on a local Qwen3 LLM that doubles as the refinement model.
 - **Refinement** — on-device Qwen3 strips fillers, fixes punctuation, optional self-correction rewrites; Whisper hallucination-loop stripping at a 6-token threshold; per-capture flag snapshots; model picker (0.6B / 1.7B / 4B).
 - **`POST /speak` REST wrapper** and **i18next foundation** (English + zh-CN) also landed.
@@ -189,7 +189,7 @@ Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a ful
 | Model | PR / Branch | Reason |
 |-------|-------------|--------|
 | **CosyVoice2/3** | PR #311 | Output quality too poor. Heavy deps, no PyPI, needed 5+ shims. PR should be closed. |
-| **VoxCPM 1.5 / VoxCPM2** | `voicebox-new-models` research (2026-04-18) | **Backlogged.** See detailed analysis below. |
+| **VoxCPM 1.5 / VoxCPM2** | `kobevoice-new-models` research (2026-04-18) | **Backlogged.** See detailed analysis below. |
 
 #### VoxCPM — Evaluation Notes (2026-04-18)
 
@@ -209,7 +209,7 @@ Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a ful
   - **CPU unsupported in the Python package** — issue #256 shows `voxcpm --device cpu` rejected with `unrecognized arguments`. The only CPU path is the third-party **VoxCPM.cpp** GGML engine, which is a separate ecosystem project, not `pip install voxcpm`.
   - **macOS source install fails** — issue #233 open with no resolution.
 - Would require CUDA-only gating in UI (new `requires_cuda` flag on `ModelConfig`, lock icon + "Requires NVIDIA GPU" in `ModelManagement.tsx` / `EngineModelSelector.tsx`) plus a hard error at `load_model()` as safety net. Doable but adds first-class platform gating that doesn't exist for any other engine today.
-- Voicebox's user base skews Apple Silicon (MLX is a primary backend). Shipping a CUDA-only model sets a precedent worth a separate scoping discussion (see issues #419 engine sprawl, #420 platform tiers, PR #465).
+- Kobevoice's user base skews Apple Silicon (MLX is a primary backend). Shipping a CUDA-only model sets a precedent worth a separate scoping discussion (see issues #419 engine sprawl, #420 platform tiers, PR #465).
 
 **What would change the decision:**
 - Upstream fixes MPS crashes (watch issues #232, #248).
@@ -226,7 +226,7 @@ Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a ful
 | Engine sprawl cleanup | issue #419 | First-class vs experimental TTS backends distinction |
 | Frontend tech-debt burn-down | issue #421 | Biome + a11y debt before gating CI |
 | Docker registry auto-publish | PR #463, issue #453 | ghcr.io image on tag push |
-| New model research | `voicebox-new-models` branch | Evaluating Fish Speech, XTTS-v2, Pocket TTS, VibeVoice, Fish Audio S2, index-tts2 |
+| New model research | `kobevoice-new-models` branch | Evaluating Fish Speech, XTTS-v2, Pocket TTS, VibeVoice, Fish Audio S2, index-tts2 |
 
 ### TTS Engine Comparison
 
@@ -394,7 +394,7 @@ One contributor opened a large, coherent quality suite in a single day. Review a
 | Long-form / chunking / export | ~16 | Pause control, speed control, audiobook export, >50k chars |
 | Linux / Wayland | ~11 | Build failures, Wayland panics, CUDA-on-Linux packaging |
 | MCP / agent / API | ~9 | Dotted tool names (#790), scrambled audio (#780), OpenAI compat (#10) |
-| Security / trust | ~4 | DNS-rebinding (#778), malware flag (#369); funding via official $VOICEBOX token (#806) |
+| Security / trust | ~4 | DNS-rebinding (#778), malware flag (#369); funding via official $KOBEVOICE token (#806) |
 
 **Highest-engagement open issues:** #185 Fine-tune instructions (32c) · #98 Connecting to Download (16c) · #301 CUDA generation failure (18c) · #20 Model download failed (13c) · #364 Voxtral-TTS FR (11r) · #341 Arch Linux build · #513 server startup failed (12c) · #138 ONNX/Piper export (9r) · #10 OpenAI API compat.
 
@@ -407,7 +407,7 @@ One contributor opened a large, coherent quality suite in a single day. Review a
 - **GPU expansion requests:** #676 DirectML (AMD/Intel), #759 Intel Arc, #684 RTX 5060 Ti CUDA 13, #774 CUDA 11.x for older cards, #767 Linux CUDA installs Windows `.exe`.
 - **New engines/langs:** #791 OmniVoice, #633 VoxCPM2, #690 Dramabox, #638 Bengali, #754 zh-TW, #761 Filipino.
 - **Open plugin interface (#771):** request for a community engine/provider plugin API — ties into engine-sprawl (#419) and platform-gating work.
-- **Trust/security:** #806 — `$VOICEBOX` is the official dev-backed funding token (concern raised and resolved on-thread; see funding note above); #778 DNS-rebinding/Host-header exposure on local API+MCP (fixes attached) — genuine security item; #369 macOS malware flag (ongoing).
+- **Trust/security:** #806 — `$KOBEVOICE` is the official dev-backed funding token (concern raised and resolved on-thread; see funding note above); #778 DNS-rebinding/Host-header exposure on local API+MCP (fixes attached) — genuine security item; #369 macOS malware flag (ongoing).
 
 ### GPU / Hardware Detection — still the top category
 
@@ -531,7 +531,7 @@ Notable:
 | macOS | #441 (older macOS), #369 (malware flag), #334 (microphone permission), #287 (`check_model_inputs` ImportError — regression), #171 (ARM64 binary won't open) |
 | Profile/UI | #360 (Kokoro profile hides others — partly addressed by auto-switch), #299 (drag-drop on Win11), #329 (size selector state bug), #393 (stuck loading screen after reinstall to new dir) |
 | Integrations | #397 (SAMMI-bot 422 Unprocessable Entity) |
-| Audio playback / session | **#41** (macOS: Voicebox goes silent after another app takes audio output; restart restores it) — see deep-dive below |
+| Audio playback / session | **#41** (macOS: Kobevoice goes silent after another app takes audio output; restart restores it) — see deep-dive below |
 | Database | #174 (sqlite3 IntegrityError) |
 
 ---
@@ -702,8 +702,8 @@ The two-month gap means the highest-leverage work isn't new code — it's review
 
 | Branch | PR | Status | Notes |
 |--------|-----|--------|-------|
-| `voicebox-new-models` | — | **Active** | New model research (Fish Speech, Pocket TTS, VibeVoice, etc.); VoxCPM evaluated & backlogged |
-| `fix/kokoro-pyinstaller-source-files` | — | Active | Kokoro frozen-build source bundling (parent of `voicebox-new-models`) |
+| `kobevoice-new-models` | — | **Active** | New model research (Fish Speech, Pocket TTS, VibeVoice, etc.); VoxCPM evaluated & backlogged |
+| `fix/kokoro-pyinstaller-source-files` | — | Active | Kokoro frozen-build source bundling (parent of `kobevoice-new-models`) |
 | `feat/cosyvoice-engine` | #311 | Open — closing | CosyVoice2/3 — abandoned, poor quality |
 | `feat/kokoro` | #325 | **Merged** | Kokoro 82M + voice profile type system |
 | `feat/qwen-custom-voice` | #328 | **Merged** | Qwen CustomVoice preset engine |

@@ -2,7 +2,7 @@
 
 The MCP endpoint lives at ``/mcp`` (Streamable HTTP transport). Modern MCP
 clients (Claude Code, Cursor, Windsurf, VS Code MCP extensions) connect
-directly via URL; older stdio-only clients use the ``voicebox-mcp`` shim
+directly via URL; older stdio-only clients use the ``kobevoice-mcp`` shim
 binary bundled with the desktop app.
 """
 
@@ -23,12 +23,12 @@ logger = logging.getLogger(__name__)
 
 
 def build_mcp_server() -> FastMCP:
-    """Create the FastMCP instance with Voicebox tools registered."""
+    """Create the FastMCP instance with Kobevoice tools registered."""
     mcp = FastMCP(
-        name="voicebox",
+        name="kobevoice",
         instructions=(
-            "Voicebox is a local voice I/O layer. Use `voicebox.speak` to "
-            "play text in a voice profile, `voicebox.transcribe` for "
+            "Kobevoice is a local voice I/O layer. Use `kobevoice.speak` to "
+            "play text in a voice profile, `kobevoice.transcribe` for "
             "audio→text, and the `list_*` tools to discover profiles and "
             "captures."
         ),
@@ -63,7 +63,7 @@ def mount_into(
 def compose_lifespan(*lifespans):
     """Combine multiple async context managers into a single FastAPI lifespan.
 
-    Used by ``create_app`` to run the existing Voicebox startup/shutdown
+    Used by ``create_app`` to run the existing Kobevoice startup/shutdown
     together with FastMCP's session manager (which MUST run in the
     ASGI lifespan for Streamable HTTP to work).
     """

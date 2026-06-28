@@ -6,15 +6,15 @@ import {Navbar} from "@/components/Navbar";
 import {CLOUD_FEATURES, CLOUD_NOTIFY_URL} from "@/lib/pricing";
 
 export const metadata: Metadata = {
-	title: "Cloud Backup & Sync — Voicebox",
+	title: "Cloud Backup & Sync — Kobevoice",
 	description:
-		"End-to-end encrypted backup and sync for your Voicebox library. We can't read your data — only your devices can. Optional, local-first, free for $VOICEBOX holders.",
+		"End-to-end encrypted backup and sync for your Kobevoice library. We can't read your data — only your devices can. Optional, local-first, free for $KOBEVOICE holders.",
 	openGraph: {
-		title: "Voicebox Cloud — encrypted backup & sync",
+		title: "Kobevoice Cloud — encrypted backup & sync",
 		description:
 			"End-to-end encrypted backup and sync across desktop and mobile. The server is blind — only your devices can decrypt.",
 		type: "website",
-		url: "https://voicebox.sh/cloud",
+		url: "https://kobevoice.app/cloud",
 		images: [{url: "/og.webp", width: 1200, height: 630}],
 	},
 };
@@ -52,7 +52,7 @@ export default function CloudPage() {
 					<div className="fade-in mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1">
 						<Cloud className="h-3.5 w-3.5 text-accent" />
 						<span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-							Voicebox Cloud · coming soon
+							Kobevoice Cloud · coming soon
 						</span>
 					</div>
 
@@ -62,10 +62,10 @@ export default function CloudPage() {
 
 					<p className="fade-in mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
 						Optional, end-to-end encrypted backup and sync for your entire
-						Voicebox library. We can't read a byte of it — only your devices
+						Kobevoice library. We can't read a byte of it — only your devices
 						can. Free for{" "}
 						<Link href="/token" className="text-foreground underline-offset-4 hover:underline">
-							$VOICEBOX
+							$KOBEVOICE
 						</Link>{" "}
 						holders.
 					</p>
@@ -159,7 +159,7 @@ export default function CloudPage() {
 							We can't see your data. That's the point.
 						</h2>
 						<p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-							Voicebox is local-first and privacy-first. The cloud keeps that
+							Kobevoice is local-first and privacy-first. The cloud keeps that
 							promise: your library is encrypted before it leaves your device,
 							the server stores only ciphertext, and the keys never leave your
 							control. Same philosophy as the app — just backed up.

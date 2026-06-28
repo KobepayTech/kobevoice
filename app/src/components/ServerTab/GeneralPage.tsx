@@ -73,7 +73,7 @@ export function GeneralPage() {
     <div className="space-y-8 max-w-2xl">
       <div className="grid grid-cols-2 gap-3">
         <a
-          href="https://docs.voicebox.sh"
+          href="https://docs.kobevoice.app"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-3 rounded-lg border border-border/60 p-4 transition-colors hover:bg-muted/50"
@@ -81,7 +81,7 @@ export function GeneralPage() {
           <Book className="h-5 w-5 shrink-0 text-accent" strokeWidth={2.5} />
           <div className="min-w-0 flex-1">
             <div className="text-sm font-medium">{t('settings.general.docs.title')}</div>
-            <div className="text-xs text-muted-foreground">docs.voicebox.sh</div>
+            <div className="text-xs text-muted-foreground">docs.kobevoice.app</div>
           </div>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
         </a>

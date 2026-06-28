@@ -46,7 +46,7 @@ export function getDefaultServerUrl(): string {
   return fallback;
 }
 
-export function isLoopbackVoiceboxServerUrl(url: string): boolean {
+export function isLoopbackKobevoiceServerUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     return (
@@ -86,7 +86,7 @@ export const useServerStore = create<ServerStore>()(
       setCustomModelsDir: (dir) => set({ customModelsDir: dir }),
     }),
     {
-      name: 'voicebox-server',
+      name: 'kobevoice-server',
     },
   ),
 );

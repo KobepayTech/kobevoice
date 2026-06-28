@@ -69,7 +69,7 @@ export function Testimonials() {
 						What people are saying
 					</h2>
 					<p className="text-muted-foreground max-w-2xl mx-auto">
-						Voicebox has passed 1M+ downloads. Here's a handful of notes from
+						Kobevoice has passed 1M+ downloads. Here's a handful of notes from
 						the people using it every day.
 					</p>
 				</div>

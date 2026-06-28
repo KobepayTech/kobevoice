@@ -1,11 +1,11 @@
 services:
-  voicebox:
+  kobevoice:
     build: .
-    container_name: voicebox
+    container_name: kobevoice
     restart: unless-stopped
 
     ports:
-      # Host-side moved to 17600 so the dev/installed Voicebox can keep 17493.
+      # Host-side moved to 17600 so the dev/installed Kobevoice can keep 17493.
       # Container still listens on its native port internally.
       - "127.0.0.1:17600:17493"
 
@@ -16,17 +16,17 @@ services:
       - ./output:/app/data/generations
 
       # Named volume for profiles, DB, cache (persists across container restarts)
-      - voicebox-data:/app/data
+      - kobevoice-data:/app/data
 
       # HuggingFace model cache (so models aren't re-downloaded on rebuild)
-      - huggingface-cache:/home/voicebox/.cache/huggingface
+      - huggingface-cache:/home/kobevoice/.cache/huggingface
 
     environment:
       - LOG_LEVEL=info
       - NUMBA_CACHE_DIR=/tmp/numba_cache
 
     networks:
-      - voicebox-net
+      - kobevoice-net
 
     deploy:
       resources:
@@ -35,9 +35,9 @@ services:
           memory: 8G
 
 networks:
-  voicebox-net:
+  kobevoice-net:
     driver: bridge
 
 volumes:
-  voicebox-data:
+  kobevoice-data:
   huggingface-cache:

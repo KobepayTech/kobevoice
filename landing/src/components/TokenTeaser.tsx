@@ -28,7 +28,7 @@ export function TokenTeaser() {
 					</h2>
 
 					<p className="max-w-xl text-muted-foreground">
-						An optional way to back the project and have some fun. Voicebox is and
+						An optional way to back the project and have some fun. Kobevoice is and
 						always will be{" "}
 						<b className="text-foreground">free and open source</b> — the token is
 						not required to use anything here.

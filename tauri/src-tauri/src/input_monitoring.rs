@@ -12,8 +12,8 @@
 //!     grant without prompting. We call this from the Captures settings UI
 //!     so the row can show "granted" / "missing" without surprising the user.
 //!   - `IOHIDRequestAccess(kIOHIDRequestTypeListenEvent)` — fire the
-//!     "Voicebox would like to receive keystrokes from any application"
-//!     dialog and add Voicebox to the Input Monitoring pane (toggle off).
+//!     "Kobevoice would like to receive keystrokes from any application"
+//!     dialog and add Kobevoice to the Input Monitoring pane (toggle off).
 //!     Returns true when access is already granted; otherwise returns false
 //!     and queues the prompt. The user still has to flip the toggle on; this
 //!     just gets us into the list.

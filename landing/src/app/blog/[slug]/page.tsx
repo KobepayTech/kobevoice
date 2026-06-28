@@ -16,15 +16,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
 	const {slug} = await params;
 	const post = getPost(slug);
-	if (!post) return {title: "Post not found — Voicebox"};
+	if (!post) return {title: "Post not found — Kobevoice"};
 	return {
-		title: `${post.title} — Voicebox`,
+		title: `${post.title} — Kobevoice`,
 		description: post.excerpt,
 		openGraph: {
 			title: post.title,
 			description: post.excerpt,
 			type: "article",
-			url: `https://voicebox.sh/blog/${post.slug}`,
+			url: `https://kobevoice.app/blog/${post.slug}`,
 			// og:image / twitter:image come from the colocated opengraph-image.tsx
 		},
 		twitter: {

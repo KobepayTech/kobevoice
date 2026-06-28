@@ -15,7 +15,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-logger = logging.getLogger("voicebox.chunked-tts")
+logger = logging.getLogger("kobevoice.chunked-tts")
 
 # Default chunk size in characters.  Can be overridden per-request via
 # the ``max_chunk_chars`` field on GenerationRequest.

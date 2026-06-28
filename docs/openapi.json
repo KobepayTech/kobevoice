@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "voicebox API",
+    "title": "kobevoice API",
     "description": "Production-quality Qwen3-TTS voice cloning API",
     "version": "0.1.0"
   },

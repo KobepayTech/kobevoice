@@ -9,7 +9,7 @@ export const CLOUD_STATUS = "coming-soon" as const; // → flips to "live" at la
 export const CLOUD_PRICE_YEARLY = 12; // launch price for the Cloud tier (USD/yr)
 
 /** Where "get notified" CTAs point until there's a real signup flow. */
-export const CLOUD_NOTIFY_URL = "https://x.com/VoiceboxAI";
+export const CLOUD_NOTIFY_URL = "https://x.com/KobevoiceAI";
 
 export type BillingPeriod = "monthly" | "annual";
 
@@ -39,7 +39,7 @@ export const PRICING_TIERS: PricingTier[] = [
 		annual: 0,
 		priceNote: "No account required",
 		badge: "Available now",
-		cta: {label: "Download Voicebox", href: "/download"},
+		cta: {label: "Download Kobevoice", href: "/download"},
 		features: [
 			"Voice cloning across every TTS engine",
 			"Dictation & Capture (audio kept alongside transcript)",
@@ -54,7 +54,7 @@ export const PRICING_TIERS: PricingTier[] = [
 		tagline: "Backup & sync for everything you make.",
 		monthly: 2, // placeholder
 		annual: CLOUD_PRICE_YEARLY, // $12 launch price (≈50% off monthly)
-		priceNote: "Launch price · free for $VOICEBOX holders",
+		priceNote: "Launch price · free for $KOBEVOICE holders",
 		highlighted: true,
 		badge: "Coming soon",
 		cta: {label: "Get notified", href: CLOUD_NOTIFY_URL},
@@ -105,7 +105,7 @@ export const CLOUD_FEATURES: CloudFeature[] = [
 	},
 	{
 		title: "Back up everything",
-		body: "Voice profiles, generations, and captures — including the original audio Voicebox keeps alongside each transcript — safe off your machine.",
+		body: "Voice profiles, generations, and captures — including the original audio Kobevoice keeps alongside each transcript — safe off your machine.",
 	},
 	{
 		title: "Sync across devices",
@@ -121,6 +121,6 @@ export const CLOUD_FEATURES: CloudFeature[] = [
 	},
 	{
 		title: "Optional & local-first",
-		body: "Voicebox works fully offline without an account. Cloud is an add-on for when you want backup and sync — never a requirement.",
+		body: "Kobevoice works fully offline without an account. Cloud is an add-on for when you want backup and sync — never a requirement.",
 	},
 ];

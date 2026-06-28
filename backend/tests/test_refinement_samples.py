@@ -339,7 +339,7 @@ def detect_backend_port(hint: Optional[int]) -> int:
         except Exception:
             continue
     raise SystemExit(
-        "No running Voicebox backend found. Start it (`python backend/main.py`) "
+        "No running Kobevoice backend found. Start it (`python backend/main.py`) "
         f"or pass --port. Tried: {candidates}"
     )
 
@@ -407,7 +407,7 @@ def format_report(cards: list[Scorecard]) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port", type=int, default=None,
-                    help="Voicebox backend port (auto-detected if omitted)")
+                    help="Kobevoice backend port (auto-detected if omitted)")
     ap.add_argument("--model", choices=("0.6B", "1.7B", "4B"), action="append",
                     help="Refinement model size(s) to test (repeat to run several)")
     ap.add_argument("--json", type=Path, default=None,

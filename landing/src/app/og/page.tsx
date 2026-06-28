@@ -29,7 +29,7 @@ export default function OgPreview() {
             }}
           />
           <img
-            src="/voicebox-logo-app.webp"
+            src="/kobevoice-logo-app.webp"
             alt=""
             className="relative shrink-0 object-contain"
             style={{ width: 260, height: 260 }}
@@ -44,7 +44,7 @@ export default function OgPreview() {
                 color: 'hsl(30, 10%, 94%)',
               }}
             >
-              Voicebox
+              Kobevoice
             </h1>
             <p
               style={{

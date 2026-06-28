@@ -1,21 +1,21 @@
 ---
 title: "Docker Deployment"
-description: "Run Voicebox as a headless server with a web UI using Docker"
+description: "Run Kobevoice as a headless server with a web UI using Docker"
 ---
 
 ## Overview
 
-Voicebox can run as a Docker container with a full web UI -- no desktop app required. This is ideal for headless servers, shared GPU machines, or self-hosted deployments.
+Kobevoice can run as a Docker container with a full web UI -- no desktop app required. This is ideal for headless servers, shared GPU machines, or self-hosted deployments.
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/jamiepine/voicebox.git
-cd voicebox
+git clone https://github.com/kobepaytech/kobevoice.git
+cd kobevoice
 docker compose up
 ```
 
-Open [http://localhost:17493](http://localhost:17493) in your browser. The full Voicebox UI is served directly from the backend.
+Open [http://localhost:17493](http://localhost:17493) in your browser. The full Kobevoice UI is served directly from the backend.
 
 <Callout type="info">
   The first build takes a few minutes (compiling the frontend, installing Python dependencies). Subsequent starts are fast thanks to Docker layer caching.
@@ -39,16 +39,16 @@ The default `docker-compose.yml` binds to localhost only, mounts persistent volu
 
 ```yaml
 services:
-  voicebox:
+  kobevoice:
     build: .
-    container_name: voicebox
+    container_name: kobevoice
     restart: unless-stopped
     ports:
       - "127.0.0.1:17493:17493"
     volumes:
       - ./output:/app/data/generations
-      - voicebox-data:/app/data
-      - huggingface-cache:/home/voicebox/.cache/huggingface
+      - kobevoice-data:/app/data
+      - huggingface-cache:/home/kobevoice/.cache/huggingface
     environment:
       - LOG_LEVEL=info
     deploy:
@@ -76,8 +76,8 @@ ports:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `LOG_LEVEL` | `info` | Logging verbosity (`debug`, `info`, `warning`, `error`) |
-| `VOICEBOX_MODELS_DIR` | (HuggingFace cache) | Custom path for model storage |
-| `VOICEBOX_CORS_ORIGINS` | (local origins) | Additional CORS origins, comma-separated |
+| `KOBEVOICE_MODELS_DIR` | (HuggingFace cache) | Custom path for model storage |
+| `KOBEVOICE_CORS_ORIGINS` | (local origins) | Additional CORS origins, comma-separated |
 
 ### Resource Limits
 
@@ -100,8 +100,8 @@ deploy:
 | Volume | Container Path | Purpose |
 |--------|---------------|---------|
 | `./output` | `/app/data/generations` | Generated audio files (bind-mount, easy access from host) |
-| `voicebox-data` | `/app/data` | Profiles, database, cache |
-| `huggingface-cache` | `/home/voicebox/.cache/huggingface` | Downloaded models (persists across rebuilds) |
+| `kobevoice-data` | `/app/data` | Profiles, database, cache |
+| `huggingface-cache` | `/home/kobevoice/.cache/huggingface` | Downloaded models (persists across rebuilds) |
 
 The `huggingface-cache` volume is important -- without it, models would be re-downloaded every time the container is rebuilt.
 
@@ -113,7 +113,7 @@ To use your NVIDIA GPU inside the container, install the [NVIDIA Container Toolk
 
 ```yaml
 services:
-  voicebox:
+  kobevoice:
     build: .
     # ... existing config ...
     deploy:
@@ -131,7 +131,7 @@ For AMD GPUs, use the ROCm runtime:
 
 ```yaml
 services:
-  voicebox:
+  kobevoice:
     build: .
     # ... existing config ...
     devices:
@@ -149,24 +149,24 @@ The default configuration runs on CPU. This works fine but generation will be sl
 
 The Docker image follows security best practices:
 
-- **Non-root user** -- the server runs as `voicebox`, not `root`
+- **Non-root user** -- the server runs as `kobevoice`, not `root`
 - **Localhost binding** -- only accessible from the host machine by default
 - **Health checks** -- automatic restart if the server hangs (`/health` endpoint polled every 30s)
 - **CORS restricted** -- only local origins allowed by default
 
 ### Running Behind a Reverse Proxy
 
-For production deployments, put Voicebox behind nginx or Caddy with TLS and authentication:
+For production deployments, put Kobevoice behind nginx or Caddy with TLS and authentication:
 
 ```nginx
 server {
     listen 443 ssl;
-    server_name voicebox.example.com;
+    server_name kobevoice.example.com;
 
-    ssl_certificate /etc/ssl/certs/voicebox.pem;
-    ssl_certificate_key /etc/ssl/private/voicebox.key;
+    ssl_certificate /etc/ssl/certs/kobevoice.pem;
+    ssl_certificate_key /etc/ssl/private/kobevoice.key;
 
-    auth_basic "Voicebox";
+    auth_basic "Kobevoice";
     auth_basic_user_file /etc/nginx/.htpasswd;
 
     location / {
@@ -181,7 +181,7 @@ server {
 
 ### Container starts but UI shows JSON
 
-If you see `{"message": "voicebox API", ...}` instead of the web UI, the frontend build may have failed during the Docker build. Check the build logs:
+If you see `{"message": "kobevoice API", ...}` instead of the web UI, the frontend build may have failed during the Docker build. Check the build logs:
 
 ```bash
 docker compose build --no-cache
@@ -195,7 +195,7 @@ Make sure the `huggingface-cache` volume is configured. Without it, the model ca
 
 ```yaml
 volumes:
-  - huggingface-cache:/home/voicebox/.cache/huggingface
+  - huggingface-cache:/home/kobevoice/.cache/huggingface
 ```
 
 ### Out of memory
@@ -226,7 +226,7 @@ We plan to publish prebuilt Docker images to GitHub Container Registry so you wo
 
 ```bash
 # Not available yet — coming in a future release
-docker run -p 17493:17493 ghcr.io/jamiepine/voicebox:latest
+docker run -p 17493:17493 ghcr.io/kobepaytech/kobevoice:latest
 ```
 
 The CPU image will be ~3-4 GB (Python + PyTorch + TTS packages). A separate CUDA tag (~6-8 GB) will be available for NVIDIA GPU users. This is normal for ML containers.

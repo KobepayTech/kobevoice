@@ -65,7 +65,7 @@ Tie it to concrete shipped changes. No vague hype.>
 
 ### <Feature/Theme Group>
 - Bullet points with specifics
-- Reference PRs where available: ([#123](https://github.com/jamiepine/voicebox/pull/123))
+- Reference PRs where available: ([#123](https://github.com/kobepaytech/kobevoice/pull/123))
 
 ### <Another Group>
 - ...

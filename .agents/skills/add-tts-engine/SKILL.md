@@ -1,13 +1,13 @@
 ---
 name: add-tts-engine
-description: Use this skill to add a new TTS engine to Voicebox. It walks through dependency research, backend implementation, frontend wiring, PyInstaller bundling, and frozen-build testing. Always start with Phase 0 (dependency audit) before writing any code.
+description: Use this skill to add a new TTS engine to Kobevoice. It walks through dependency research, backend implementation, frontend wiring, PyInstaller bundling, and frozen-build testing. Always start with Phase 0 (dependency audit) before writing any code.
 ---
 
 # Add TTS Engine
 
 ## Goal
 
-Integrate a new text-to-speech engine into Voicebox end-to-end: dependency research, backend protocol implementation, frontend UI wiring, PyInstaller bundling, and frozen-build verification. The user should only need to test the final build locally.
+Integrate a new text-to-speech engine into Kobevoice end-to-end: dependency research, backend protocol implementation, frontend UI wiring, PyInstaller bundling, and frozen-build verification. The user should only need to test the final build locally.
 
 ## Reference Doc
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Voicebox",
+  "productName": "Kobevoice",
   "version": "0.5.0",
-  "identifier": "sh.voicebox.app",
+  "identifier": "com.kobepaytech.kobevoice",
   "build": {
     "beforeDevCommand": "bun run dev",
     "beforeBuildCommand": "bun run build",
@@ -13,7 +13,7 @@
     "active": true,
     "targets": "all",
     "createUpdaterArtifacts": "v1Compatible",
-    "externalBin": ["binaries/voicebox-server", "binaries/voicebox-mcp"],
+    "externalBin": ["binaries/kobevoice-server", "binaries/kobevoice-mcp"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -29,7 +29,7 @@
     },
     "resources": {
       "gen/Assets.car": "./",
-      "gen/voicebox.icns": "./",
+      "gen/kobevoice.icns": "./",
       "gen/partial.plist": "./"
     }
   },
@@ -61,7 +61,7 @@
     },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUxRENBQkRBQjdBNTM1OTIKUldTU05hVzMycXZjNGJGcUxmcVVocll2QjdSaTJNdlFxR2M3VDJsMnVvbDdyZGRPMmRlOW9aWTcK",
-      "endpoints": ["https://github.com/jamiepine/voicebox/releases/latest/download/latest.json"]
+      "endpoints": ["https://github.com/kobepaytech/kobevoice/releases/latest/download/latest.json"]
     }
   }
 }

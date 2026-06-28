@@ -123,10 +123,10 @@ jobs:
           mkdir -p ../tauri/src-tauri/binaries
 
           # Copy with platform suffix
-          cp dist/voicebox-server.exe ../tauri/src-tauri/binaries/voicebox-server-${PLATFORM}.exe
-          cp dist/voicebox-mcp.exe ../tauri/src-tauri/binaries/voicebox-mcp-${PLATFORM}.exe
-          echo "Built voicebox-server-${PLATFORM}.exe"
-          echo "Built voicebox-mcp-${PLATFORM}.exe"
+          cp dist/kobevoice-server.exe ../tauri/src-tauri/binaries/kobevoice-server-${PLATFORM}.exe
+          cp dist/kobevoice-mcp.exe ../tauri/src-tauri/binaries/kobevoice-mcp-${PLATFORM}.exe
+          echo "Built kobevoice-server-${PLATFORM}.exe"
+          echo "Built kobevoice-mcp-${PLATFORM}.exe"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -222,7 +222,7 @@ jobs:
         with:
           projectPath: tauri
           tagName: v__VERSION__
-          releaseName: "voicebox v__VERSION__"
+          releaseName: "kobevoice v__VERSION__"
           releaseBody: ${{ steps.changelog.outputs.notes }}
           releaseDraft: true
           prerelease: false
@@ -315,7 +315,7 @@ jobs:
         shell: bash
         run: |
           python scripts/package_cuda.py \
-            backend/dist/voicebox-server-cuda/ \
+            backend/dist/kobevoice-server-cuda/ \
             --output release-assets/ \
             --cuda-libs-version cu128-v1 \
             --torch-compat ">=2.7.0,<2.11.0"
@@ -325,8 +325,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            release-assets/voicebox-server-cuda.tar.gz
-            release-assets/voicebox-server-cuda.tar.gz.sha256
+            release-assets/kobevoice-server-cuda.tar.gz
+            release-assets/kobevoice-server-cuda.tar.gz.sha256
             release-assets/cuda-libs-cu128-v1.tar.gz
             release-assets/cuda-libs-cu128-v1.tar.gz.sha256
             release-assets/cuda-libs.json
@@ -337,6 +337,6 @@ jobs:
       - name: Upload onedir as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: voicebox-server-cuda-windows
-          path: backend/dist/voicebox-server-cuda/
+          name: kobevoice-server-cuda-windows
+          path: backend/dist/kobevoice-server-cuda/
           retention-days: 7

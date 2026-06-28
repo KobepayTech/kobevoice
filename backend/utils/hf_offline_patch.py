@@ -154,7 +154,7 @@ def patch_transformers_mistral_regex():
     variant. That call raises on ``HF_HUB_OFFLINE=1`` and on plain network
     failures, killing unrelated loads (Qwen TTS, TADA, etc.).
 
-    Voicebox never loads Mistral models, so the rewrite the function would
+    Kobevoice never loads Mistral models, so the rewrite the function would
     apply is a no-op for us anyway. Wrap the method so any exception from the
     metadata lookup returns the tokenizer unchanged — matching the success-path
     behavior for non-Mistral repos (transformers 4.57.3,
@@ -264,7 +264,7 @@ def ensure_original_qwen_config_cached():
             logger.warning("could not create cache symlink for %s", original_repo, exc_info=True)
 
 
-if os.environ.get("VOICEBOX_OFFLINE_PATCH", "1") != "0":
+if os.environ.get("KOBEVOICE_OFFLINE_PATCH", "1") != "0":
     patch_huggingface_hub_offline()
     patch_transformers_mistral_regex()
     ensure_original_qwen_config_cached()

@@ -1,11 +1,11 @@
 ---
 title: "Building"
-description: "How Voicebox is built for production"
+description: "How Kobevoice is built for production"
 ---
 
 ## Overview
 
-Voicebox uses a two-stage build process:
+Kobevoice uses a two-stage build process:
 
 1. **Python Server Binary** — PyInstaller bundles the FastAPI backend into a standalone executable
 2. **Tauri Desktop App** — Bundles the React frontend, Rust wrapper, and Python server as a sidecar
@@ -33,7 +33,7 @@ cd backend
 python build_binary.py
 
 # Copy to Tauri's binaries directory
-cp dist/voicebox-server ../tauri/src-tauri/binaries/voicebox-server-${PLATFORM}
+cp dist/kobevoice-server ../tauri/src-tauri/binaries/kobevoice-server-${PLATFORM}
 ```
 
 ### PyInstaller Configuration
@@ -119,13 +119,13 @@ The server binary is declared as an external binary in `tauri.conf.json`:
 {
   "tauri": {
     "bundle": {
-      "externalBin": ["binaries/voicebox-server"]
+      "externalBin": ["binaries/kobevoice-server"]
     }
   }
 }
 ```
 
-Tauri looks for `voicebox-server-${PLATFORM}` in `src-tauri/binaries/` and bundles it.
+Tauri looks for `kobevoice-server-${PLATFORM}` in `src-tauri/binaries/` and bundles it.
 
 ## GitHub Actions Release
 
@@ -162,7 +162,7 @@ The `build-cuda-windows` job runs separately:
 1. Install PyTorch with CUDA 12.8
 2. Build with `build_binary.py --cuda` (produces `--onedir` output)
 3. Package with `scripts/package_cuda.py` into two archives:
-   - `voicebox-server-cuda.tar.gz` — server core (~945 MB)
+   - `kobevoice-server-cuda.tar.gz` — server core (~945 MB)
    - `cuda-libs-cu128-v1.tar.gz` — NVIDIA runtime libraries (~1.7 GB, cached independently)
 4. Upload archives as release artifacts
 
@@ -187,6 +187,6 @@ This binary is downloaded on-demand by users who enable CUDA in settings. The CU
   </Accordion>
 
   <Accordion title="Tauri can't find sidecar">
-    Ensure binary exists at `tauri/src-tauri/binaries/voicebox-server-${PLATFORM}` before running Tauri build.
+    Ensure binary exists at `tauri/src-tauri/binaries/kobevoice-server-${PLATFORM}` before running Tauri build.
   </Accordion>
 </AccordionGroup>

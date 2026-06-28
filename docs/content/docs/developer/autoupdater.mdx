@@ -1,15 +1,15 @@
 ---
 title: "Auto-Updater"
-description: "How Voicebox automatic updates work"
+description: "How Kobevoice automatic updates work"
 ---
 
 ## Overview
 
-Voicebox uses Tauri's built-in auto-updater to deliver signed updates to users. The system verifies updates cryptographically before installation.
+Kobevoice uses Tauri's built-in auto-updater to deliver signed updates to users. The system verifies updates cryptographically before installation.
 
 ## How It Works
 
-When Voicebox launches (in production Tauri builds only), it checks GitHub Releases for a `latest.json` manifest. If a newer version is available:
+When Kobevoice launches (in production Tauri builds only), it checks GitHub Releases for a `latest.json` manifest. If a newer version is available:
 
 1. **Notification** - An update banner appears at the top of the app
 2. **Download** - User clicks "Install Now" to download the update package
@@ -30,7 +30,7 @@ The updater is configured in `tauri/src-tauri/tauri.conf.json`:
       "active": true,
       "dialog": false,
       "endpoints": [
-        "https://github.com/jamiepine/voicebox/releases/latest/download/latest.json"
+        "https://github.com/kobepaytech/kobevoice/releases/latest/download/latest.json"
       ],
       "pubkey": "PASTE_PUBLIC_KEY_CONTENT_HERE"
     }
@@ -55,19 +55,19 @@ The `latest.json` file defines available updates per platform:
   "platforms": {
     "darwin-aarch64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/jamiepine/voicebox/releases/download/v0.2.0/voicebox_0.2.0_aarch64.app.tar.gz"
+      "url": "https://github.com/kobepaytech/kobevoice/releases/download/v0.2.0/kobevoice_0.2.0_aarch64.app.tar.gz"
     },
     "darwin-x86_64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/jamiepine/voicebox/releases/download/v0.2.0/voicebox_0.2.0_x64.app.tar.gz"
+      "url": "https://github.com/kobepaytech/kobevoice/releases/download/v0.2.0/kobevoice_0.2.0_x64.app.tar.gz"
     },
     "linux-x86_64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/jamiepine/voicebox/releases/download/v0.2.0/voicebox_0.2.0_amd64.AppImage"
+      "url": "https://github.com/kobepaytech/kobevoice/releases/download/v0.2.0/kobevoice_0.2.0_amd64.AppImage"
     },
     "windows-x86_64": {
       "signature": "base64_encoded_signature",
-      "url": "https://github.com/jamiepine/voicebox/releases/download/v0.2.0/voicebox_0.2.0_x64_en-US.msi"
+      "url": "https://github.com/kobepaytech/kobevoice/releases/download/v0.2.0/kobevoice_0.2.0_x64_en-US.msi"
     }
   }
 }
@@ -79,11 +79,11 @@ Updates must be cryptographically signed to be accepted. The signing process:
 
 1. **Generate keys** (one-time setup):
    ```bash
-   bun tauri signer generate -w ~/.tauri/voicebox.key
+   bun tauri signer generate -w ~/.tauri/kobevoice.key
    ```
    This creates:
-   - Private key: `~/.tauri/voicebox.key` (stored in GitHub Secrets, never committed)
-   - Public key: `~/.tauri/voicebox.key.pub` (pasted into `tauri.conf.json`)
+   - Private key: `~/.tauri/kobevoice.key` (stored in GitHub Secrets, never committed)
+   - Public key: `~/.tauri/kobevoice.key.pub` (pasted into `tauri.conf.json`)
 
 2. **Build with signing** (GitHub Actions handles this):
    - Set `TAURI_SIGNING_PRIVATE_KEY` environment variable
@@ -110,7 +110,7 @@ git tag v0.2.0 && git push --tags
 
 GitHub Actions needs these secrets set:
 
-- `TAURI_SIGNING_PRIVATE_KEY` - Content of `~/.tauri/voicebox.key`
+- `TAURI_SIGNING_PRIVATE_KEY` - Content of `~/.tauri/kobevoice.key`
 - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` - Password for the key (if set)
 
 ## Security
@@ -149,17 +149,17 @@ The CUDA-enabled backend is distributed separately from the main app because bun
 
 **Size comparison (approximate):**
 - Standard CPU bundle (in the installer): ~200–400 MB
-- CUDA server core: ~945 MB (versioned with each Voicebox release)
+- CUDA server core: ~945 MB (versioned with each Kobevoice release)
 - CUDA libs (NVIDIA runtime DLLs): ~1.7 GB (versioned independently, cached across upgrades)
 
 ### Two-archive split
 
 Since v0.4, the CUDA binary is packaged as **two archives** instead of one:
 
-- **Server core** (`voicebox-server-cuda.tar.gz`) — the Python server + PyTorch code, changes every release.
+- **Server core** (`kobevoice-server-cuda.tar.gz`) — the Python server + PyTorch code, changes every release.
 - **CUDA libs** (`cuda-libs-cu128-v1.tar.gz`) — the heavy NVIDIA CUDA/cuDNN DLLs, only re-downloaded when the CUDA toolkit major version changes.
 
-This means most Voicebox upgrades only re-download the ~945 MB server core, not the full ~2.5 GB bundle.
+This means most Kobevoice upgrades only re-download the ~945 MB server core, not the full ~2.5 GB bundle.
 
 ### Download Process
 
@@ -169,7 +169,7 @@ When a user clicks "Install CUDA backend" in Settings → GPU:
 2. **CUDA libs archive** — Downloaded separately (or reused if the installed version still matches).
 3. **Verification** — SHA-256 checksum verification for integrity.
 4. **Placement** — Extracted into `{data_dir}/backends/cuda/`.
-5. **Restart** — The Voicebox server restarts and swaps in the CUDA backend.
+5. **Restart** — The Kobevoice server restarts and swaps in the CUDA backend.
 
 ### Auto-Update on Startup
 
@@ -181,8 +181,8 @@ Downloaded CUDA binaries live in the app's data directory:
 
 ```
 {data_dir}/backends/cuda/
-  voicebox-server-cuda.exe    # Windows
-  voicebox-server-cuda        # macOS/Linux
+  kobevoice-server-cuda.exe    # Windows
+  kobevoice-server-cuda        # macOS/Linux
   <NVIDIA CUDA runtime DLLs>
 ```
 
@@ -203,7 +203,7 @@ Downloads report progress via Server-Sent Events (SSE):
 GET /backend/cuda-progress
 
 event: progress
-data: {"current": 52428800, "total": 945000000, "filename": "voicebox-server-cuda.tar.gz", "status": "downloading"}
+data: {"current": 52428800, "total": 945000000, "filename": "kobevoice-server-cuda.tar.gz", "status": "downloading"}
 ```
 
 The frontend subscribes to this endpoint to show real-time progress, including which archive (server core vs libs) is currently downloading.
@@ -212,7 +212,7 @@ The frontend subscribes to this endpoint to show real-time progress, including w
 
 For each CUDA-capable release, these files are uploaded to GitHub:
 
-- `voicebox-server-cuda.tar.gz` — server-core archive
-- `voicebox-server-cuda.tar.gz.sha256` — checksum
+- `kobevoice-server-cuda.tar.gz` — server-core archive
+- `kobevoice-server-cuda.tar.gz.sha256` — checksum
 - `cuda-libs-cu128-v1.tar.gz` — CUDA runtime libs (only when the libs version bumps)
 - `cuda-libs-cu128-v1.tar.gz.sha256` — checksum

@@ -6,15 +6,15 @@ import {Navbar} from "@/components/Navbar";
 import {PricingTiers} from "@/components/PricingTiers";
 
 export const metadata: Metadata = {
-	title: "Pricing — Voicebox",
+	title: "Pricing — Kobevoice",
 	description:
-		"Voicebox is free and open source forever. Optional, end-to-end encrypted cloud backup & sync — free for $VOICEBOX holders.",
+		"Kobevoice is free and open source forever. Optional, end-to-end encrypted cloud backup & sync — free for $KOBEVOICE holders.",
 	openGraph: {
-		title: "Voicebox Pricing",
+		title: "Kobevoice Pricing",
 		description:
-			"The app is free forever. Cloud backup & sync is an optional add-on — free for $VOICEBOX holders.",
+			"The app is free forever. Cloud backup & sync is an optional add-on — free for $KOBEVOICE holders.",
 		type: "website",
-		url: "https://voicebox.sh/pricing",
+		url: "https://kobevoice.app/pricing",
 		images: [{url: "/og.webp", width: 1200, height: 630}],
 	},
 };
@@ -22,14 +22,14 @@ export const metadata: Metadata = {
 const FAQ = [
 	{
 		q: "Is the app really free?",
-		a: "Yes — Voicebox is free and open source, forever. Cloning, dictation, every TTS engine, MCP, personalities: all of it runs locally with no account. The paid plans only add optional cloud backup & sync.",
+		a: "Yes — Kobevoice is free and open source, forever. Cloning, dictation, every TTS engine, MCP, personalities: all of it runs locally with no account. The paid plans only add optional cloud backup & sync.",
 	},
 	{
 		q: "What's encrypted in the cloud?",
 		a: "Everything. Your profiles, generations, and captures are end-to-end encrypted on your device before upload. The server stores only ciphertext and can never read your data.",
 	},
 	{
-		q: "Do $VOICEBOX holders really get Cloud free?",
+		q: "Do $KOBEVOICE holders really get Cloud free?",
 		a: "Yes. Holding the token unlocks the Cloud tier at no cost. The app itself is free regardless — the token is an optional way to support the project.",
 	},
 	{
@@ -60,7 +60,7 @@ export default function PricingPage() {
 						The app is free. Forever.
 					</h1>
 					<p className="fade-in mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-						Everything that makes Voicebox great runs locally at no cost. Pay
+						Everything that makes Kobevoice great runs locally at no cost. Pay
 						only if you want optional, encrypted cloud backup & sync — and
 						holders get that free.
 					</p>
@@ -81,7 +81,7 @@ export default function PricingPage() {
 					>
 						<Coins className="h-6 w-6 text-accent" />
 						<h2 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
-							Hold $VOICEBOX, get Cloud free.
+							Hold $KOBEVOICE, get Cloud free.
 						</h2>
 						<p className="max-w-xl text-sm text-muted-foreground">
 							The token is an optional way to back the project — and holders get

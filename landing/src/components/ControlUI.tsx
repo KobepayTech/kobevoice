@@ -148,14 +148,14 @@ const DEMO_SCRIPT: DemoStep[] = [
   },
   {
     profileIndex: 5,
-    text: "So we got this voice cloning software and honestly it's kind of terrifying. Like, my wife could not tell the difference. Voicebox dot s h, link in the description!",
+    text: "So we got this voice cloning software and honestly it's kind of terrifying. Like, my wife could not tell the difference. Kobevoice dot s h, link in the description!",
     audioUrl: '/audio/linus.webm',
     engine: 'Qwen 1.7B',
     duration: '0:11',
   },
   {
     profileIndex: 6,
-    text: 'This is Voicebox in one hundred seconds. It clones voices locally, it runs on your GPU, and no, OpenAI cannot hear you. Lets go.',
+    text: 'This is Kobevoice in one hundred seconds. It clones voices locally, it runs on your GPU, and no, OpenAI cannot hear you. Lets go.',
     audioUrl: '/audio/fireship.webm',
     engine: 'Qwen 0.6B',
     duration: '0:09',
@@ -740,7 +740,7 @@ export function ControlUI() {
                 }}
               >
                 <img
-                  src="/voicebox-logo-app.webp"
+                  src="/kobevoice-logo-app.webp"
                   alt=""
                   className="w-full h-full object-contain"
                 />
@@ -780,7 +780,7 @@ export function ControlUI() {
 
               {/* Header — floats above everything */}
               <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-4 md:pt-6 pb-2 flex items-center justify-between">
-                <h2 className="text-base font-bold">Voicebox</h2>
+                <h2 className="text-base font-bold">Kobevoice</h2>
                 <div className="flex items-center gap-1.5">
                   <button className="h-6 text-[10px] px-2.5 rounded-full border border-border bg-card text-muted-foreground flex items-center gap-1">
                     Import Voice

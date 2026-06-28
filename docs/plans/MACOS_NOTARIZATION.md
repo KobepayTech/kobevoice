@@ -6,13 +6,13 @@
 
 ## Context
 
-Homebrew Cask PR [#260314](https://github.com/Homebrew/homebrew-cask/pull/260314) adds `brew install --cask voicebox`. CI is green on macOS 14 and macOS 26 (arm + intel) but fails on macOS 15 (arm + intel). The 0.4.3 release added DMG-level stapling to address this, and it didn't move CI — 0.4.5 still fails. A maintainer reproduced the failure in a fresh Sequoia VM.
+Homebrew Cask PR [#260314](https://github.com/Homebrew/homebrew-cask/pull/260314) adds `brew install --cask kobevoice`. CI is green on macOS 14 and macOS 26 (arm + intel) but fails on macOS 15 (arm + intel). The 0.4.3 release added DMG-level stapling to address this, and it didn't move CI — 0.4.5 still fails. A maintainer reproduced the failure in a fresh Sequoia VM.
 
 This document is the working diagnosis plus the ordered fix plan.
 
 ## What the failing check actually does
 
-The failing step is `brew audit --cask --online --signing --new voicebox`, not `brew install`. `brew install` succeeds end-to-end in CI (the log shows `Uninstalling Cask voicebox` after the install phase). The `--signing` audit:
+The failing step is `brew audit --cask --online --signing --new kobevoice`, not `brew install`. `brew install` succeeds end-to-end in CI (the log shows `Uninstalling Cask kobevoice` after the install phase). The `--signing` audit:
 
 1. Downloads the cask's `url`
 2. Mounts the DMG
@@ -32,16 +32,16 @@ Local dev machines pass `spctl` because the first-party developer context and ca
 
 ## Where the gap is likely to be
 
-Voicebox ships PyInstaller sidecars declared in `tauri.conf.json` under `externalBin`:
+Kobevoice ships PyInstaller sidecars declared in `tauri.conf.json` under `externalBin`:
 
-- **0.4.x:** `voicebox-server` only (single `--onefile` Mach-O on macOS)
-- **0.5.0+:** `voicebox-server` and `voicebox-mcp` (`voicebox-mcp` is new in 0.5.0)
+- **0.4.x:** `kobevoice-server` only (single `--onefile` Mach-O on macOS)
+- **0.5.0+:** `kobevoice-server` and `kobevoice-mcp` (`kobevoice-mcp` is new in 0.5.0)
 
-Tauri's bundler signs each `externalBin` with the configured identity but does not apply `--options=runtime` or `--timestamp` automatically, and does not merge the outer app's entitlements into the sidecar signature. The outer `Voicebox` binary is correctly signed with hardened runtime + `disable-library-validation`; the sidecars likely are not.
+Tauri's bundler signs each `externalBin` with the configured identity but does not apply `--options=runtime` or `--timestamp` automatically, and does not merge the outer app's entitlements into the sidecar signature. The outer `Kobevoice` binary is correctly signed with hardened runtime + `disable-library-validation`; the sidecars likely are not.
 
 Order of likelihood:
 
-1. Sidecar `voicebox-server` lacks hardened runtime or a secure timestamp in its signature.
+1. Sidecar `kobevoice-server` lacks hardened runtime or a secure timestamp in its signature.
 2. The sidecar inherits the identity but was signed before tauri-action's final notarization pass, so the notarization ticket doesn't actually cover it.
 3. Something inside the sidecar's PyInstaller archive unpacks to a `.dylib` at runtime that Gatekeeper inspects during assessment.
 
@@ -52,11 +52,11 @@ The 0.5.0 fix must cover both sidecars.
 Run against a freshly downloaded release DMG (not a dev build, and from a machine that has never opened the app before):
 
 ```
-hdiutil attach Voicebox_0.4.5_aarch64.dmg
-xcrun stapler validate "/Volumes/Voicebox 0.4.5/Voicebox.app"
-spctl -a -vvv -t open --context context:primary-signature "/Volumes/Voicebox 0.4.5/Voicebox.app"
-codesign --verify --deep --strict --verbose=2 "/Volumes/Voicebox 0.4.5/Voicebox.app"
-codesign -dv --verbose=4 "/Volumes/Voicebox 0.4.5/Voicebox.app/Contents/MacOS/voicebox-server"
+hdiutil attach Kobevoice_0.4.5_aarch64.dmg
+xcrun stapler validate "/Volumes/Kobevoice 0.4.5/Kobevoice.app"
+spctl -a -vvv -t open --context context:primary-signature "/Volumes/Kobevoice 0.4.5/Kobevoice.app"
+codesign --verify --deep --strict --verbose=2 "/Volumes/Kobevoice 0.4.5/Kobevoice.app"
+codesign -dv --verbose=4 "/Volumes/Kobevoice 0.4.5/Kobevoice.app/Contents/MacOS/kobevoice-server"
 ```
 
 The last command is the tell — look for `flags=0x10000(runtime)` and a `Timestamp=` line. If either is missing, the sidecar is the failure.
@@ -71,7 +71,7 @@ Pull the 0.4.5 DMG on a fresh Sequoia environment or a VM snapshot with no trust
 
 ### Phase 2 — Sign sidecars explicitly in the release workflow
 
-Between tauri-action's build step and the DMG-notarization step already in `release.yml`, add a step that re-signs every `externalBin` present under `Voicebox.app/Contents/MacOS/` with:
+Between tauri-action's build step and the DMG-notarization step already in `release.yml`, add a step that re-signs every `externalBin` present under `Kobevoice.app/Contents/MacOS/` with:
 
 - `--options=runtime` (hardened runtime)
 - `--timestamp` (secure timestamp)
@@ -80,11 +80,11 @@ Between tauri-action's build step and the DMG-notarization step already in `rele
 
 Re-sign the outer `.app` afterward so its seal covers the updated nested signatures.
 
-Covers `voicebox-server` on 0.4.x and both sidecars from 0.5.0 forward.
+Covers `kobevoice-server` on 0.4.x and both sidecars from 0.5.0 forward.
 
 ### Phase 3 — Re-notarize and staple the `.app`
 
-After sidecars are re-signed the outer bundle's notarization ticket is stale. Submit the `.app` (zipped) to `notarytool`, wait, then `xcrun stapler staple Voicebox.app`. This puts the ticket directly on the `.app` so the `spctl -t open` audit passes without any online ticket lookup.
+After sidecars are re-signed the outer bundle's notarization ticket is stale. Submit the `.app` (zipped) to `notarytool`, wait, then `xcrun stapler staple Kobevoice.app`. This puts the ticket directly on the `.app` so the `spctl -t open` audit passes without any online ticket lookup.
 
 Then rebuild the DMG from the stapled `.app` and keep the existing DMG-level notarize/staple step — it still helps Finder drag-install.
 
@@ -94,7 +94,7 @@ Before upload, run the same four diagnostic commands against the built artifact 
 
 ### Phase 5 — Re-request Homebrew CI
 
-Once a tagged release passes Phase 4 locally, push a cask update to #260314. Expect `test voicebox (macos-15, arm)` and `test voicebox (macos-15-intel, intel)` to go green.
+Once a tagged release passes Phase 4 locally, push a cask update to #260314. Expect `test kobevoice (macos-15, arm)` and `test kobevoice (macos-15-intel, intel)` to go green.
 
 ## Open questions
 

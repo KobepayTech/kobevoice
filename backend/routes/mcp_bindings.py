@@ -2,8 +2,8 @@
 
 The Settings UI uses these to let users configure distinct voices per
 agent (Claude Code in Morgan, Cursor in Scarlett, ...). The ``client_id``
-column is the same value the MCP client sends in ``X-Voicebox-Client-Id``
-(or the stdio shim pulls from ``VOICEBOX_CLIENT_ID``).
+column is the same value the MCP client sends in ``X-Kobevoice-Client-Id``
+(or the stdio shim pulls from ``KOBEVOICE_CLIENT_ID``).
 """
 
 from datetime import datetime, timezone

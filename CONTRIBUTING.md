@@ -1,6 +1,6 @@
-# Contributing to Voicebox
+# Contributing to Kobevoice
 
-Thank you for your interest in contributing to Voicebox! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Kobevoice! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -36,8 +36,8 @@ Thank you for your interest in contributing to Voicebox! This document provides 
 Install [just](https://github.com/casey/just) (`brew install just`, `cargo install just`, or `winget install Casey.Just`), then:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/voicebox.git
-cd voicebox
+git clone https://github.com/YOUR_USERNAME/kobevoice.git
+cd kobevoice
 
 just setup   # creates venv, installs Python + JS deps
 just dev     # starts backend + desktop app
@@ -91,7 +91,7 @@ On Windows, to build with CUDA support for local testing:
 just build-local  # Build CPU + CUDA server binaries + Tauri installer
 ```
 
-This builds the CPU sidecar (bundled with the app), the CUDA binary (placed in `%APPDATA%/com.voicebox.app/backends/` for runtime GPU switching), and the installable Tauri app.
+This builds the CPU sidecar (bundled with the app), the CUDA binary (placed in `%APPDATA%/com.kobevoice.app/backends/` for runtime GPU switching), and the installable Tauri app.
 
 Creates platform-specific installers (`.dmg`, `.msi`, `.AppImage`) in `tauri/src-tauri/target/release/bundle/`.
 
@@ -235,7 +235,7 @@ def create_profile(name, language):
 ## Project Structure
 
 ```
-voicebox/
+kobevoice/
 ├── app/              # Shared React frontend
 │   └── src/
 │       ├── components/   # UI components
@@ -389,4 +389,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to Voicebox! 🎉
+Thank you for contributing to Kobevoice! 🎉

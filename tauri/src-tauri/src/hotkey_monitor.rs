@@ -6,7 +6,7 @@
 //! job is:
 //!
 //!   1. Build a `ChordMatcher` from the user's saved PTT + Toggle chords.
-//!   2. Translate `ChordEvent` → voicebox's [`Effect`] on a dispatcher
+//!   2. Translate `ChordEvent` → kobevoice's [`Effect`] on a dispatcher
 //!      thread.
 //!   3. Fan [`Effect`]s out into Tauri events + dictate-window show/hide.
 //!
@@ -128,7 +128,7 @@ impl HotkeyMonitor {
         let shutdown_for_thread = shutdown.clone();
         let app = self.app.clone();
         let dispatcher = thread::Builder::new()
-            .name("voicebox-hotkey-dispatcher".into())
+            .name("kobevoice-hotkey-dispatcher".into())
             .spawn(move || dispatcher_loop(app, matcher, shutdown_for_thread))
             .expect("spawn hotkey dispatcher thread");
 

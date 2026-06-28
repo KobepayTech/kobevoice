@@ -1,7 +1,7 @@
-"""Voicebox MCP tool implementations.
+"""Kobevoice MCP tool implementations.
 
 Thin wrappers over existing services/routes. Tools are registered with dotted
-names (``voicebox.speak`` etc.) so they look natural in agent logs —
+names (``kobevoice.speak`` etc.) so they look natural in agent logs —
 the Python function name stays snake_case.
 """
 
@@ -33,17 +33,17 @@ MAX_TRANSCRIBE_BYTES = 200 * 1024 * 1024  # 200 MB
 
 
 def register_tools(mcp: FastMCP) -> None:
-    """Attach all Voicebox tools to the given FastMCP instance."""
+    """Attach all Kobevoice tools to the given FastMCP instance."""
 
     @mcp.tool(
-        name="voicebox.speak",
+        name="kobevoice.speak",
         description=(
-            "Speak text in a Voicebox voice profile. Returns a generation id "
+            "Speak text in a Kobevoice voice profile. Returns a generation id "
             "the caller can poll at /generate/{id}/status. Audio plays on the "
             "user's speakers and is saved to the Captures / History tab."
         ),
     )
-    async def voicebox_speak(
+    async def kobevoice_speak(
         text: str,
         profile: str | None = None,
         engine: str | None = None,
@@ -72,7 +72,7 @@ def register_tools(mcp: FastMCP) -> None:
                 raise ValueError(
                     "No voice profile resolved. Pass `profile=` with a "
                     "voice profile name or id, or set a default voice in "
-                    "Voicebox → Settings → MCP."
+                    "Kobevoice → Settings → MCP."
                 )
 
             binding = None
@@ -105,14 +105,14 @@ def register_tools(mcp: FastMCP) -> None:
             db.close()
 
     @mcp.tool(
-        name="voicebox.transcribe",
+        name="kobevoice.transcribe",
         description=(
-            "Transcribe an audio clip to text using Voicebox's local Whisper. "
+            "Transcribe an audio clip to text using Kobevoice's local Whisper. "
             "Pass exactly one of `audio_base64` (bytes as base64) or "
             "`audio_path` (absolute local file path — loopback callers only)."
         ),
     )
-    async def voicebox_transcribe(
+    async def kobevoice_transcribe(
         audio_base64: str | None = None,
         audio_path: str | None = None,
         language: str | None = None,
@@ -124,7 +124,7 @@ def register_tools(mcp: FastMCP) -> None:
             )
 
         # Absolute-path mode: validate and transcribe in place. Restricted
-        # to loopback callers so a Voicebox bound on 0.0.0.0 doesn't double
+        # to loopback callers so a Kobevoice bound on 0.0.0.0 doesn't double
         # as an unauthenticated arbitrary-local-file read primitive.
         if audio_path is not None:
             if not request_is_loopback():
@@ -163,13 +163,13 @@ def register_tools(mcp: FastMCP) -> None:
             tmp_path.unlink(missing_ok=True)
 
     @mcp.tool(
-        name="voicebox.list_captures",
+        name="kobevoice.list_captures",
         description=(
             "List recent voice captures (dictations, recordings, uploads) "
             "with their transcripts. Most-recent first."
         ),
     )
-    async def voicebox_list_captures(
+    async def kobevoice_list_captures(
         limit: int = 20, offset: int = 0
     ) -> dict[str, Any]:
         if not (1 <= limit <= 200):
@@ -191,13 +191,13 @@ def register_tools(mcp: FastMCP) -> None:
             db.close()
 
     @mcp.tool(
-        name="voicebox.list_profiles",
+        name="kobevoice.list_profiles",
         description=(
             "List available voice profiles (both cloned voices and presets). "
-            "Use the returned `name` with voicebox.speak(profile=...)."
+            "Use the returned `name` with kobevoice.speak(profile=...)."
         ),
     )
-    async def voicebox_list_profiles() -> dict[str, Any]:
+    async def kobevoice_list_profiles() -> dict[str, Any]:
         db = next(get_db())
         try:
             profiles = await profiles_service.list_profiles(db)
@@ -305,7 +305,7 @@ async def _transcribe_file(
     ) and not whisper._is_model_cached(model_size):
         raise ValueError(
             f"Whisper model '{model_size}' is not yet downloaded. Open "
-            "Voicebox → Settings → Models to download it first."
+            "Kobevoice → Settings → Models to download it first."
         )
 
     text = await whisper.transcribe(str(path), language, model_size)

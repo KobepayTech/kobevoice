@@ -52,7 +52,7 @@ const USE_CASES = [
 		icon: Wrench,
 		title: "Scripts & tools",
 		description:
-			"Batch-generate audiobook chapters, automate podcast intros, or wire Voicebox into your Stream Deck. It's just a localhost URL.",
+			"Batch-generate audiobook chapters, automate podcast intros, or wire Kobevoice into your Stream Deck. It's just a localhost URL.",
 	},
 ];
 
@@ -125,7 +125,7 @@ export function ApiSection() {
 								className="text-xs text-accent hover:underline"
 							>
 								See the full OpenAPI reference at{" "}
-								<code className="font-mono">/docs</code> when Voicebox is running
+								<code className="font-mono">/docs</code> when Kobevoice is running
 								→
 							</a>
 						</div>

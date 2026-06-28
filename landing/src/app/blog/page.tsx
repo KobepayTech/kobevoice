@@ -5,13 +5,13 @@ import {Navbar} from "@/components/Navbar";
 import {formatDate, listPosts} from "@/lib/blog";
 
 export const metadata: Metadata = {
-	title: "Blog — Voicebox",
-	description: "Notes from building Voicebox — the open-source AI voice studio.",
+	title: "Blog — Kobevoice",
+	description: "Notes from building Kobevoice — the open-source AI voice studio.",
 	openGraph: {
-		title: "Voicebox Blog",
-		description: "Notes from building Voicebox — the open-source AI voice studio.",
+		title: "Kobevoice Blog",
+		description: "Notes from building Kobevoice — the open-source AI voice studio.",
 		type: "website",
-		url: "https://voicebox.sh/blog",
+		url: "https://kobevoice.app/blog",
 		images: [{url: "/og.webp", width: 1200, height: 630}],
 	},
 };
@@ -28,7 +28,7 @@ export default function BlogIndexPage() {
 					Blog
 				</div>
 				<h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-foreground">
-					Notes from building Voicebox.
+					Notes from building Kobevoice.
 				</h1>
 				<p className="mt-5 max-w-2xl text-lg text-muted-foreground">
 					The story behind the project, what's shipping next, and the occasional

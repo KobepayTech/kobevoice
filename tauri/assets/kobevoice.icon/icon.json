@@ -4,8 +4,8 @@
     {
       "layers": [
         {
-          "image-name": "Voicebox_Microphone.png",
-          "name": "Voicebox_Microphone",
+          "image-name": "Kobevoice_Microphone.png",
+          "name": "Kobevoice_Microphone",
           "position": {
             "scale": 0.36,
             "translation-in-points": [0.140625, 270.1875]
