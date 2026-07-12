@@ -52,6 +52,14 @@ import type {
   MCPClientBindingUpsert,
 } from './types';
 
+import { getAuthToken } from './authToken';
+
+/** Merge the optional cloud bearer token into request headers. */
+function withAuth(headers?: HeadersInit): HeadersInit {
+  const token = getAuthToken();
+  return token ? { ...headers, Authorization: `Bearer ${token}` } : { ...headers };
+}
+
 function formatErrorDetail(detail: unknown, fallback: string): string {
   if (typeof detail === 'string') return detail;
   if (Array.isArray(detail)) {
@@ -77,10 +85,10 @@ class ApiClient {
     const url = `${this.getBaseUrl()}${endpoint}`;
     const response = await fetch(url, {
       ...options,
-      headers: {
+      headers: withAuth({
         'Content-Type': 'application/json',
         ...options?.headers,
-      },
+      }),
     });
 
     if (!response.ok) {

@@ -5,6 +5,7 @@ import App from '../../app/src/App';
 import '../../app/src/index.css';
 import { PlatformProvider } from '../../app/src/platform/PlatformContext';
 import { webPlatform } from './platform';
+import { CloudAuthGate } from './cloud/CloudAuthGate';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <PlatformProvider platform={webPlatform}>
-        <App />
+        <CloudAuthGate>
+          <App />
+        </CloudAuthGate>
       </PlatformProvider>
     </QueryClientProvider>
   </React.StrictMode>,
