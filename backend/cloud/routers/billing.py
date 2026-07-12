@@ -41,6 +41,22 @@ def my_subscription(
     )
 
 
+def _activate_plan_locally(db: Session, user: User, plan: Plan, *, status_value: str = "active") -> None:
+    """Upsert the user's subscription to a plan without Stripe (dev simulator)."""
+    from datetime import datetime, timedelta, timezone
+
+    sub = user.subscription
+    if sub is None:
+        sub = Subscription(user_id=user.id, plan_id=plan.id)
+        db.add(sub)
+    sub.plan_id = plan.id
+    sub.status = status_value
+    sub.cancel_at_period_end = False
+    sub.current_period_start = datetime.now(timezone.utc)
+    sub.current_period_end = datetime.now(timezone.utc) + timedelta(days=30)
+    db.commit()
+
+
 @router.post("/checkout", response_model=CheckoutResponse)
 def create_checkout(
     payload: CheckoutRequest,
@@ -48,14 +64,20 @@ def create_checkout(
     db: Session = Depends(get_db),
 ) -> CheckoutResponse:
     settings = get_settings()
+    plan = db.query(Plan).filter(Plan.slug == payload.plan_slug).first()
+    if plan is None or plan.slug == "free":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid plan")
+
+    # Dev simulator: no Stripe, activate immediately so the flow is testable.
     if not settings.billing_enabled:
+        if settings.billing_dev_mode:
+            _activate_plan_locally(db, user, plan)
+            return CheckoutResponse(url=f"{settings.frontend_url}/?checkout=success&dev=1")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Billing is not configured on this server",
         )
-    plan = db.query(Plan).filter(Plan.slug == payload.plan_slug).first()
-    if plan is None or plan.slug == "free":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid plan")
+
     if not plan.stripe_price_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

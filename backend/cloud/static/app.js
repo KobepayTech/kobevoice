@@ -76,6 +76,7 @@ document.querySelectorAll(".tab").forEach((tab) => {
     document.querySelectorAll("[data-pane]").forEach((p) =>
       p.classList.toggle("hidden", p.dataset.pane !== name));
     if (name === "plans") loadPlans();
+    if (name === "generate") loadHistory();
     if (name === "keys") loadKeys();
     if (name === "admin") loadAdmin();
   });
@@ -141,21 +142,62 @@ $("#portalBtn").addEventListener("click", async () => {
 });
 
 // ---------- Generate ----------
+async function fetchAudioURL(audioUrl) {
+  const res = await fetch(audioUrl, { headers: { Authorization: `Bearer ${token()}` } });
+  if (!res.ok) throw new Error("Could not load audio");
+  return URL.createObjectURL(await res.blob());
+}
+
 $("#speakBtn").addEventListener("click", async () => {
-  $("#speakError").textContent = ""; $("#speakResult").textContent = "";
+  $("#speakError").textContent = "";
   $("#speakBtn").disabled = true; $("#speakHint").textContent = "Generating…";
   try {
-    const r = await api("/api/voice/speak", { method: "POST", body: { text: $("#speakText").value } });
-    $("#speakResult").textContent = JSON.stringify(r, null, 2);
+    const r = await api("/api/voice/speak", {
+      method: "POST",
+      body: { text: $("#speakText").value, profile_id: $("#speakVoice").value || null },
+    });
+    const player = $("#speakAudio");
+    player.src = await fetchAudioURL(r.audio_url);
+    player.classList.remove("hidden");
+    player.play().catch(() => {});
     $("#speakHint").textContent = "Done — usage recorded.";
     loadOverview();
+    loadHistory();
   } catch (err) {
     $("#speakHint").textContent = "";
     $("#speakError").textContent = err.message.includes("unavailable")
-      ? "Quota OK, but the voice engine isn't running. Start it with: uvicorn backend.main:app --port 8000"
+      ? "Quota OK, but the voice engine isn't running. Start it with: uvicorn backend.engine_lite.main:app --port 8000"
       : err.message;
   } finally { $("#speakBtn").disabled = false; }
 });
+
+async function loadHistory() {
+  const gens = await api("/api/voice/generations");
+  const box = $("#genHistory");
+  if (!gens.length) { box.innerHTML = "No generations yet."; return; }
+  box.innerHTML = "";
+  gens.forEach((g) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.cssText = "padding:10px 0;border-bottom:1px solid var(--border)";
+    const text = g.text.length > 60 ? g.text.slice(0, 60) + "…" : g.text;
+    row.innerHTML = `<div style="flex:1"><div>${text}</div>
+      <div class="muted" style="font-size:12px">${g.voice || "default"} · ${g.characters} chars · ${new Date(g.created_at).toLocaleString()}</div></div>`;
+    const play = document.createElement("button");
+    play.className = "ghost small"; play.textContent = "▶ Play";
+    play.addEventListener("click", async () => {
+      const player = $("#speakAudio");
+      player.src = await fetchAudioURL(g.audio_url);
+      player.classList.remove("hidden");
+      player.play().catch(() => {});
+    });
+    const del = document.createElement("button");
+    del.className = "danger small"; del.textContent = "Delete";
+    del.addEventListener("click", async () => { await api(`/api/voice/generations/${g.id}`, { method: "DELETE" }); loadHistory(); });
+    row.appendChild(play); row.appendChild(del);
+    box.appendChild(row);
+  });
+}
 
 // ---------- API keys ----------
 async function loadKeys() {

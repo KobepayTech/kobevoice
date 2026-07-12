@@ -82,14 +82,33 @@
       <div class="card">
         <h2>Generate speech</h2>
         <div class="sub">Sends text through the metered cloud voice gateway.</div>
-        <label>Text</label>
-        <textarea id="speakText" rows="4" placeholder="Type something to speak…">Hello from Kobevoice Cloud.</textarea>
+        <div class="row" style="gap:14px">
+          <div style="flex:1;min-width:200px">
+            <label>Text</label>
+            <textarea id="speakText" rows="4" placeholder="Type something to speak…">Hello from Kobevoice Cloud.</textarea>
+          </div>
+          <div style="width:140px">
+            <label>Voice</label>
+            <select id="speakVoice">
+              <option value="">default</option>
+              <option value="female">female</option>
+              <option value="male">male</option>
+              <option value="en-gb">en-gb</option>
+              <option value="whisper">whisper</option>
+            </select>
+          </div>
+        </div>
         <div class="row" style="margin-top:12px">
           <button id="speakBtn">Generate</button>
           <span class="muted" id="speakHint" style="font-size:13px"></span>
         </div>
         <div class="error" id="speakError"></div>
-        <pre id="speakResult" class="muted" style="white-space:pre-wrap;font-size:12px;margin-top:10px"></pre>
+        <audio id="speakAudio" controls class="hidden" style="width:100%;margin-top:12px"></audio>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Your generations</h2>
+        <div class="sub">Stored in your account — the engine keeps nothing.</div>
+        <div id="genHistory" class="muted">No generations yet.</div>
       </div>
     </section>
 

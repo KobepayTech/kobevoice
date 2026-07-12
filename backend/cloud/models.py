@@ -122,6 +122,31 @@ class UsageRecord(Base):
     user = relationship("User", back_populates="usage_records")
 
 
+class CloudGeneration(Base):
+    """A synthesized clip owned by a user.
+
+    The engine is stateless — it just returns audio — so the cloud is the
+    system of record for every user's generation history and stored audio.
+    This is what makes the product multi-tenant without touching the engine.
+    """
+
+    __tablename__ = "cloud_generations"
+
+    id = Column(String, primary_key=True, default=_uuid)
+    user_id = Column(String, ForeignKey("cloud_users.id"), nullable=False, index=True)
+    text = Column(String, nullable=False)
+    voice = Column(String, nullable=True)
+    language = Column(String, nullable=True)
+    engine = Column(String, nullable=True)
+    characters = Column(Integer, default=0, nullable=False)
+    audio_path = Column(String, nullable=True)  # relative to the audio store
+    content_type = Column(String, default="audio/wav", nullable=False)
+    status = Column(String, default="complete", nullable=False)  # complete | failed
+    created_at = Column(DateTime, default=_now, nullable=False)
+
+    user = relationship("User")
+
+
 class ApiKey(Base):
     """Hashed API key so users/agents can call the cloud voice API headlessly."""
 

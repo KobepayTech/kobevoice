@@ -10,6 +10,7 @@ import tempfile
 # Must run before any `backend.cloud` import.
 _tmp_db = os.path.join(tempfile.mkdtemp(prefix="kvcloud-test-"), "cloud.db")
 os.environ["KOBEVOICE_CLOUD_DATABASE_URL"] = f"sqlite:///{_tmp_db}"
+os.environ["KOBEVOICE_CLOUD_AUDIO_DIR"] = os.path.join(os.path.dirname(_tmp_db), "audio")
 os.environ["KOBEVOICE_CLOUD_JWT_SECRET"] = "test-secret"
 os.environ["KOBEVOICE_CLOUD_ADMIN_EMAIL"] = "admin@kobevoice-admin.example.com"
 os.environ["KOBEVOICE_CLOUD_ADMIN_PASSWORD"] = "adminpass123"

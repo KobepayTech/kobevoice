@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./data/cloud.db"
     frontend_url: str = "http://localhost:5173"
     environment: str = "development"
+    # Where per-user generated audio is stored (local dir; swap for S3/R2 later).
+    audio_dir: str = "./data/cloud_audio"
 
     # --- Auth / JWT ---
     # CHANGE THIS IN PRODUCTION. A random value is acceptable for dev only.
@@ -43,9 +45,19 @@ class Settings(BaseSettings):
     stripe_price_cloud: str = ""
     stripe_price_pro: str = ""
 
+    # Dev-only: when true (and Stripe is NOT configured), "checkout" activates
+    # the chosen plan immediately in the local DB so the full upgrade flow can
+    # be exercised without Stripe keys. Never enable in production.
+    billing_dev_mode: bool = False
+
     @property
     def billing_enabled(self) -> bool:
         return bool(self.stripe_secret_key)
+
+    @property
+    def billing_available(self) -> bool:
+        """Either real Stripe or the local dev simulator can process upgrades."""
+        return self.billing_enabled or self.billing_dev_mode
 
 
 @lru_cache

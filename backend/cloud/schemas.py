@@ -106,9 +106,23 @@ class ApiKeyCreatedResponse(ApiKeyResponse):
 # --- Voice gateway ---
 class SpeakRequest(BaseModel):
     text: str = Field(min_length=1)
-    profile_id: str | None = None
+    profile_id: str | None = None  # voice/profile identifier passed to the engine
     engine: str | None = None
     language: str | None = None
+
+
+class GenerationResponse(BaseModel):
+    id: str
+    status: str
+    text: str
+    voice: str | None
+    characters: int
+    engine: str | None
+    audio_url: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # --- Admin ---
