@@ -1,0 +1,44 @@
+# Kobevoice SaaS stack — the control-plane + a runnable voice engine.
+#
+#   docker compose -f docker-compose.cloud.yml up --build
+#
+# Then open the dashboard at http://localhost:9000 and sign in.
+# (Billing runs in dev-mode so upgrades work without Stripe; set real
+#  KOBEVOICE_CLOUD_STRIPE_* vars and BILLING_DEV_MODE=false for production.)
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: backend/engine_lite/Dockerfile
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cloud:
+    build:
+      context: .
+      dockerfile: backend/cloud/Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      KOBEVOICE_CLOUD_ENGINE_URL: http://engine:8000
+      KOBEVOICE_CLOUD_DATABASE_URL: sqlite:////data/cloud.db
+      KOBEVOICE_CLOUD_AUDIO_DIR: /data/audio
+      KOBEVOICE_CLOUD_FRONTEND_URL: http://localhost:9000
+      # Dev conveniences — change for production:
+      KOBEVOICE_CLOUD_BILLING_DEV_MODE: "true"
+      KOBEVOICE_CLOUD_JWT_SECRET: change-me-in-production
+      KOBEVOICE_CLOUD_ADMIN_EMAIL: admin@kobevoice.app
+      KOBEVOICE_CLOUD_ADMIN_PASSWORD: change-me
+    volumes:
+      - cloud_data:/data
+    depends_on:
+      engine:
+        condition: service_healthy
+
+volumes:
+  cloud_data:
