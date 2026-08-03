@@ -1,0 +1,3 @@
+[submodule "services/livekit-agents"]
+	path = services/livekit-agents
+	url = https://github.com/livekit/agents.git
