@@ -1,3 +1,6 @@
 [submodule "services/livekit-agents"]
 	path = services/livekit-agents
 	url = https://github.com/livekit/agents.git
+[submodule "tools/voicebox"]
+	path = tools/voicebox
+	url = https://github.com/jamiepine/voicebox.git
