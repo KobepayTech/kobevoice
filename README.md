@@ -44,11 +44,32 @@ powershell -ExecutionPolicy Bypass -File scripts\start.ps1
 
 Voicebox should expose its local API at `http://127.0.0.1:17493/docs`. Ollama should be available at `http://127.0.0.1:11434`.
 
+## Kobe Voice Quest game prototype
+
+The repository also contains a local voice-controlled adventure called **Kobe Voice Quest: The Hidden City of Bahari**. Players speak or type actions in English or Kiswahili. Ollama narrates the consequences, Voicebox speaks the response, and SQLite remembers the story session.
+
+Start it after completing the normal setup:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\start-game.ps1
+```
+
+Open `http://127.0.0.1:8081`.
+
+Game endpoints:
+
+- `POST /api/game/voice-turn`
+- `POST /api/game/text-turn`
+- `GET /api/game/history/{session_id}`
+- `GET /api/game/audio/{generation_id}`
+
+This prototype proves that the same local voice platform can power AI characters, interactive stories, language-learning games, quizzes, mystery games, and later multiplayer voice rooms through LiveKit.
+
 ## Configuration
 
 `setup.ps1` creates `.env` and `config/business.json` from the examples. Set an explicit `VOICEBOX_PROFILE_ID` for predictable production behavior; otherwise the first Voicebox profile is used.
 
-Important endpoints:
+Important business endpoints:
 
 - `GET /api/health`
 - `POST /api/conversation`
@@ -67,6 +88,6 @@ docker compose up --build
 
 ## Next milestone
 
-Replace push-to-talk with continuous real-time audio through self-hosted LiveKit, then connect Asterisk/SIP or a GSM gateway. The same local Ollama, Voicebox, business prompt, and call storage will be reused.
+Replace push-to-talk with continuous real-time audio through self-hosted LiveKit, then connect Asterisk/SIP or a GSM gateway. The same local Ollama, Voicebox, business prompt, game narrator, and session storage will be reused.
 
 Only clone voices with explicit permission. Tell callers they are speaking with an AI and when calls are recorded. Never collect passwords, PINs, card details, or authentication secrets.
