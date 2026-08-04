@@ -16,6 +16,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt
-      - run: python -m py_compile backend/main.py
-      - name: Import application
-        run: python -c "from backend.main import app; print(app.title)"
+      - run: python -m py_compile backend/main.py backend/game.py
+      - name: Import applications
+        run: python -c "from backend.main import app as business_app; from backend.game import app as game_app; print(business_app.title, game_app.title)"
