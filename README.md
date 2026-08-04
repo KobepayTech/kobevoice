@@ -63,7 +63,41 @@ Game endpoints:
 - `GET /api/game/history/{session_id}`
 - `GET /api/game/audio/{generation_id}`
 
-This prototype proves that the same local voice platform can power AI characters, interactive stories, language-learning games, quizzes, mystery games, and later multiplayer voice rooms through LiveKit.
+## Kobe Voice Arena public party game
+
+**Kobe Voice Arena** is a faster public game designed for parties, schools, events, livestreams, and social sharing. A host creates a six-character room code. Players join from their phones, receive a short funny prompt, submit a spoken or typed answer, and vote for the funniest response. Winners earn scoreboard points.
+
+Start Arena after the normal setup:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\start-arena.ps1
+```
+
+Open `http://127.0.0.1:8082` on the host computer. Other players on the same network can open `http://HOST_COMPUTER_IP:8082` and join using the room code.
+
+Arena features in the current prototype:
+
+- Public room creation and joining
+- English or Kiswahili AI-generated prompts
+- Voice or typed answers
+- Local Whisper transcription
+- Audience voting
+- Scoreboard and multiple rounds
+- SQLite room, player, answer, and vote storage
+- Browser polling, ready to be replaced by LiveKit real-time events
+
+Arena endpoints include:
+
+- `POST /api/arena/rooms`
+- `POST /api/arena/rooms/{code}/join`
+- `POST /api/arena/rooms/{code}/start-round`
+- `POST /api/arena/rooms/{code}/voice-answer`
+- `POST /api/arena/rooms/{code}/text-answer`
+- `POST /api/arena/rooms/{code}/open-voting`
+- `POST /api/arena/rooms/{code}/vote`
+- `POST /api/arena/rooms/{code}/finish-round`
+
+These prototypes prove that the same local voice platform can power AI characters, public party games, interactive stories, language-learning games, quizzes, mystery games, and later multiplayer voice rooms through LiveKit.
 
 ## Configuration
 
@@ -88,6 +122,6 @@ docker compose up --build
 
 ## Next milestone
 
-Replace push-to-talk with continuous real-time audio through self-hosted LiveKit, then connect Asterisk/SIP or a GSM gateway. The same local Ollama, Voicebox, business prompt, game narrator, and session storage will be reused.
+Replace push-to-talk and browser polling with continuous real-time audio and events through self-hosted LiveKit. Then connect Asterisk/SIP or a GSM gateway for the business agent and add internet-ready moderated public rooms for Arena.
 
-Only clone voices with explicit permission. Tell callers they are speaking with an AI and when calls are recorded. Never collect passwords, PINs, card details, or authentication secrets.
+Only clone voices with explicit permission. Tell callers they are speaking with an AI and when calls are recorded. Public rooms need reporting, blocking, profanity filtering, rate limits, and age-appropriate moderation before an internet launch.
