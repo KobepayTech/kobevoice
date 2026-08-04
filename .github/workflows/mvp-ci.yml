@@ -16,6 +16,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt
-      - run: python -m py_compile backend/main.py backend/game.py
+      - run: python -m py_compile backend/main.py backend/game.py backend/arena.py
       - name: Import applications
-        run: python -c "from backend.main import app as business_app; from backend.game import app as game_app; print(business_app.title, game_app.title)"
+        run: python -c "from backend.main import app as business_app; from backend.game import app as quest_app; from backend.arena import app as arena_app; print(business_app.title, quest_app.title, arena_app.title)"
