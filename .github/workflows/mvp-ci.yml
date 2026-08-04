@@ -19,3 +19,5 @@ jobs:
       - run: python -m py_compile backend/main.py backend/game.py backend/arena.py
       - name: Import applications
         run: python -c "from backend.main import app as business_app; from backend.game import app as quest_app; from backend.arena import app as arena_app; print(business_app.title, quest_app.title, arena_app.title)"
+      - name: Validate browser scripts
+        run: node -e "for (const f of ['frontend/index.html','game_frontend/index.html','arena_frontend/index.html']) { const s=require('fs').readFileSync(f,'utf8').match(/<script>([\\s\\S]*?)<\\/script>/)[1]; new Function(s); console.log(f); }"
