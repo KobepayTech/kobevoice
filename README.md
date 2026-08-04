@@ -97,7 +97,41 @@ Arena endpoints include:
 - `POST /api/arena/rooms/{code}/vote`
 - `POST /api/arena/rooms/{code}/finish-round`
 
-These prototypes prove that the same local voice platform can power AI characters, public party games, interactive stories, language-learning games, quizzes, mystery games, and later multiplayer voice rooms through LiveKit.
+## Rap Box competitive rap battle game
+
+**Rap Box** is a 1-vs-1 competitive rap battle product built on the same local voice stack. Contestants create or accept a challenge, perform over an original or properly licensed beat, record timed video verses, receive live beat-reactive visual effects, collect audience votes, publish the battle, and sell recorded copies.
+
+Start Rap Box after the normal setup:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\start-rapbox.ps1
+```
+
+Open `http://127.0.0.1:8083`.
+
+Current Rap Box MVP features:
+
+- Six-character battle challenge codes
+- Two contestant consent records
+- Original, AI-generated, or licensed beat library
+- ACE-Step-ready beat upload workflow
+- Webcam and microphone verse recording
+- Beat mixed into the recorded performance
+- Live fire, neon, comic, waveform, timer, and stage-name overlays
+- Configurable 15-120 second battle verses
+- Audience voting
+- Contestant and public replay prices
+- Published battle catalog
+- Pending replay orders
+- Administrator payment confirmation
+- Protected paid-download tokens
+- Download packages containing performance videos and a license manifest
+
+Voicebox is used for speech, voice processing, transcription, and announcer voices. A separate local music model such as ACE-Step is used to generate beats. The current MVP accepts generated beat files; automatic ACE-Step job submission is a later integration milestone.
+
+The Rap Box API remains under `/api/rap/` so existing clients are not broken by the product rename.
+
+These prototypes prove that the same local voice platform can power AI characters, public party games, interactive stories, language-learning games, quizzes, mystery games, music competitions, and later multiplayer voice rooms through LiveKit.
 
 ## Configuration
 
@@ -122,6 +156,6 @@ docker compose up --build
 
 ## Next milestone
 
-Replace push-to-talk and browser polling with continuous real-time audio and events through self-hosted LiveKit. Then connect Asterisk/SIP or a GSM gateway for the business agent and add internet-ready moderated public rooms for Arena.
+Replace push-to-talk and browser polling with continuous real-time audio and events through self-hosted LiveKit. Then connect Asterisk/SIP or a GSM gateway for the business agent, add automatic ACE-Step beat generation and FFmpeg final battle rendering for Rap Box, and add internet-ready moderated public rooms.
 
-Only clone voices with explicit permission. Tell callers they are speaking with an AI and when calls are recorded. Public rooms need reporting, blocking, profanity filtering, rate limits, and age-appropriate moderation before an internet launch.
+Only clone voices with explicit permission. Tell callers they are speaking with an AI and when calls are recorded. Public rooms need reporting, blocking, profanity filtering, rate limits, age-appropriate moderation, explicit performance and resale consent, transparent revenue splits, and rights checks for beats before an internet launch.
