@@ -1,113 +1,109 @@
 # Kobe Voice
 
-An AI call-center platform: inbound and outbound phone calls handled by voice agents, with live transcripts, human transfer, and a supervisor dashboard.
+An AI call-center platform: inbound and outbound phone calls handled by voice agents, with live transcripts, human transfer, compliance gating, and a supervisor dashboard.
 
 Built on [LiveKit Agents](https://docs.livekit.io/agents/). Telephony arrives over SIP, so the platform is not tied to a single carrier.
 
-## Repository layout
+> **Status: no phone call has been placed or received yet.** Every component below is built and tested locally, but the telephony leg needs a SIP trunk and a purchased number — see [What is not done](#what-is-not-done).
+
+## Layout
 
 ```
 kobevoice/
-├── agent/        Voice agent engine  (LiveKit Agents, Python)   ← current focus
-├── dashboard/    Supervisor web UI   (LiveKit React starter)     — not started
-└── outbound/     Outbound campaigns  (SIP dialer, transfer)      — not started
+├── api/         Control plane — FastAPI + Postgres (tenants, calls, compliance, KobeOS)
+├── agent/       Voice agent worker — LiveKit Agents, Chatterbox TTS, telephony tools
+├── dashboard/   Supervisor web UI — Next.js 15 + LiveKit React
+└── docker-compose.yml
 ```
 
-`agent/` is derived from [livekit-examples/agent-starter-python](https://github.com/livekit-examples/agent-starter-python) (MIT). The upstream copyright notice is retained in `agent/LICENSE.livekit`.
+`agent/` and `dashboard/` derive from LiveKit's MIT starters; upstream notices are kept in each directory's `LICENSE.livekit`.
 
-## What the starter already gives us
-
-Worth knowing before building anything, because several call-center features are already solved upstream:
-
-| Capability | Status |
-|---|---|
-| Turn detection | Semantic + acoustic end-of-turn model (not just silence) |
-| Adaptive interruption | Distinguishes a real interruption from a backchannel like "mhm" — the agent keeps talking through the latter |
-| Preemptive generation | LLM starts drafting before end-of-turn, cutting perceived latency |
-| Expressive TTS | LLM emits inline delivery tags (emotion, pacing) that TTS renders and transcripts hide |
-| Docker + CI + tests | Dockerfile, ruff, and three behavioural evals ship with it |
-
-The [outbound-caller](https://github.com/livekit-examples/outbound-caller-python) example (also MIT) adds the call-center primitives we'll want in `outbound/`: `transfer_call` (SIP REFER to a human), `end_call`, and `detected_answering_machine` for voicemail — about 244 readable lines.
-
-## Running the agent
-
-Requires Python 3.10–3.14 and a LiveKit API key.
+## Quick start
 
 ```bash
-cd agent
-uv venv --python 3.11 .venv
-uv pip install --python .venv/bin/python -e .
-cp .env.example .env.local     # fill in LIVEKIT_* credentials
-.venv/bin/python src/agent.py dev
+docker compose up --build          # postgres + api + agent + dashboard
 ```
 
-Tests are live behavioural evals — they call a real model, so they need credentials:
+Or per service:
 
 ```bash
+# API — 22 tests
+cd api && uv venv --python 3.11 .venv
+uv pip install --python .venv/bin/python -e ".[dev]"
 .venv/bin/python -m pytest tests/ -q
+.venv/bin/python -m uvicorn kobeos.main:app --app-dir src --port 8000
+
+# Dashboard
+cd dashboard && pnpm install && pnpm build && pnpm dev
+
+# Agent
+cd agent && .venv/bin/python src/agent.py dev
 ```
 
-## Model providers, and a note on self-hosting
+## Compliance is enforced in code, not policy
 
-The starter routes every model through **LiveKit Inference**, LiveKit's hosted gateway, rather than through direct provider plugins. Defaults are:
+Outbound calling — especially collections — is regulated. Rather than leave that to process, the dialler calls `POST /compliance/check-dialable` before every attempt, and the gate **fails closed**: if the compliance service is unreachable, the call is refused. An outage costs calls; it does not generate violations.
 
-- **LLM** — `google/gemma-4-31b-it`
-- **STT** — `assemblyai/universal-3-5-pro`
-- **TTS** — `fishaudio/s2.1-pro`
+Three checks, in order:
 
-Two consequences worth being deliberate about:
+1. **Do-not-call** — per tenant, permanent. The table deliberately has no `is_active` flag, so the dialler cannot toggle a DNC entry off.
+2. **Consent** — append-only records. A revocation anywhere in a number's history blocks it permanently; later consent does not resurrect it.
+3. **Calling window** — 08:00–21:00 in the *called party's* local timezone, resolved from their contact record. An unresolvable timezone blocks the call rather than guessing.
 
-**Self-hosting is partial by default.** The LiveKit *server* self-hosts fine, but LiveKit *Inference* is a hosted service and needs a `LIVEKIT_API_KEY` — which is why the test suite above fails without one. For a fully self-hosted stack, swap the `inference.*` calls in `src/agent.py` for direct provider plugins (`livekit-plugins-openai`, `-anthropic`, `-deepgram`, and so on) pointed at your own endpoints.
+Agents also expose an `add_to_do_not_call` tool, so a caller saying "stop calling me" is honoured mid-call rather than after the fact.
 
-**The Fish Audio licence question is resolved.** The starter's default TTS is Fish Audio S2.1 Pro delivered *through LiveKit's commercial gateway* — so we get that voice quality on normal commercial terms, with no GPU and none of the non-commercial research-licence constraints that apply to self-hosting the `fish-speech` weights directly.
+The 08:00–21:00 default reflects US TCPA hours. It is a starting point, not a jurisdiction survey — confirm with whoever owns compliance before dialling.
 
-## Voice cloning: self-hosted Chatterbox
+## Text-to-speech
 
-For cloned agent voices without sending a reference clip to a third party, `agent/src/chatterbox_tts.py` is a LiveKit TTS plugin wrapping [Chatterbox](https://github.com/resemble-ai/chatterbox) (Resemble AI, **MIT** — commercial use permitted outright).
+Selected by `KOBEVOICE_TTS`:
 
-```bash
-cd agent
-uv pip install --python .venv/bin/python -e ".[chatterbox]"
-KOBEVOICE_TTS=chatterbox CHATTERBOX_VOICE_SAMPLE=./voices/agent.wav \
-  .venv/bin/python src/agent.py dev
-```
+| Value | What it is | Licence | Notes |
+|---|---|---|---|
+| `inference` (default) | LiveKit's hosted gateway (Fish Audio S2.1 Pro) | Commercial SaaS | No GPU. Needs `LIVEKIT_API_KEY`. |
+| `chatterbox` | Self-hosted [Chatterbox](https://github.com/resemble-ai/chatterbox) | **MIT** | Voice cloning from ~10s of reference audio. **Needs a GPU.** |
 
-Cloning takes a reference clip of roughly ten seconds. There is no LiveKit plugin for Chatterbox upstream, so this one is ours.
+**Measured, not claimed:** Chatterbox on CPU runs at **RTF 12–24** — 31 seconds to synthesize 2.6 seconds of speech. That is dead air on a phone call, so `CHATTERBOX_DEVICE` defaults to `cuda` and never silently falls back to CPU.
 
-### Measured behaviour, not vendor claims
+Two upstream constraints are handled in `agent/src/chatterbox_tts.py`: the model has **no streaming API** (so it is wrapped in LiveKit's `StreamAdapter` to speak sentence-by-sentence rather than after the whole reply), and it is **synchronous** (so generation runs in a thread executor instead of blocking every other call on the worker).
 
-Verified locally on this codebase:
+**Packaging trap:** Chatterbox's `perth` watermarker imports `pkg_resources`, removed in setuptools 81. Without the `setuptools<81` pin the model fails with a misleading `'NoneType' object is not callable`.
 
-| Property | Result |
+### Considered and rejected
+
+- **fish-speech** — Fish Audio Research License: non-commercial without a separate written agreement, and that covers derivative works, so modifying it changes nothing. Use the hosted gateway instead (which is what `inference` does).
+- **[Miso TTS 8B](https://github.com/Shard-MW/misotts)** — MIT-with-attribution (only binding above 50M MAU or $10M/month revenue), 24 kHz, voice cloning via audio context, English only, no streaming. Same integration shape as Chatterbox but ~16x the parameters, so materially more GPU per concurrent call. Worth revisiting as a quality upgrade if GPU headroom allows.
+
+## API surface
+
+| Area | Endpoints |
 |---|---|
-| Audio out of the plugin | Clean speech, 24 kHz mono, correct 16-bit PCM |
-| Model load | ~18 s (once, at worker start via `prewarm()`) |
-| **CPU real-time factor** | **~12–24x slower than realtime** |
+| Tenancy | `POST /tenants` |
+| Agent builder | `POST/GET /agents`, `GET /agents/{id}` |
+| Calls | `GET /calls`, `GET/POST /calls/{id}/transcript`, `GET /stats` |
+| Compliance | `POST /compliance/check-dialable`, `/compliance/dnc`, `/compliance/consent` |
+| KobeOS | `/contacts`, `/orders`, `/payments` (model), `/reservations`, `/tickets` |
 
-**That RTF is the headline: Chatterbox needs a GPU.** At RTF 12 a two-second reply takes twenty-four seconds to synthesize — dead air on a phone call. `CHATTERBOX_DEVICE` therefore defaults to `cuda` and never silently falls back to CPU.
+Every business table is tenant-scoped, and tenant isolation is covered by tests — including that fetching another tenant's agent by ID returns 404 rather than the record.
 
-### Two upstream constraints the plugin works around
+## What is not done
 
-**No streaming API.** `generate()` returns one complete waveform, so time-to-first-audio equals full synthesis time. `build_tts()` wraps the model in LiveKit's `StreamAdapter` with a sentence tokenizer, so the agent starts speaking after the first sentence rather than the last. Use `build_tts()`, not `ChatterboxTTS` directly.
+Being explicit, because the gap matters more than the code that exists:
 
-**Synchronous and compute-bound.** Calling it inline would block the event loop and stall every other call on the worker, so generation runs in a thread executor.
+- **No real phone call, inbound or outbound.** SIP trunk, phone-number provisioning, and inbound routing are unbuilt. This is the single biggest gap and the riskiest remaining integration.
+- **Authentication is a trust-me header.** `X-Tenant-Slug` is unauthenticated — any caller can claim any tenant. **Replace before exposing this service anywhere.**
+- **Outbound campaign runner.** The per-call tools exist (`agent/src/telephony.py`); the campaign loop that walks a contact list does not.
+- **Call recording.** Modelled (`recordings`, with a required consent basis) but nothing writes audio to storage.
+- **Dashboard is the stock LiveKit starter.** It builds and connects to a room; it does not yet render the call list, transcripts, or stats this API exposes.
+- **No Alembic migrations.** `init_db()` creates tables for development only.
+- **GPU latency for Chatterbox** and **cloning quality from a real reference clip** remain unmeasured.
 
-### A packaging trap worth knowing
+## Verified
 
-Chatterbox's watermarker (`perth`) imports `pkg_resources`, which setuptools removed in v81. On a modern venv the model fails to load with a misleading `TypeError: 'NoneType' object is not callable`. The `chatterbox` extra pins `setuptools<81` to prevent it.
+What was actually run, not assumed:
 
-### Still unverified
-
-Everything above was measured on CPU. Latency on a GPU, and cloning quality from a real reference clip, remain untested — I had no GPU and no reference sample. Those are the two things to check before committing Chatterbox to production.
-
-Swapping to OpenAI Realtime is a documented one-line change in `src/agent.py` (install `livekit-agents[openai]`, replace the `llm=` argument); Anthropic and others are available the same way.
-
-## Before outbound dialling goes live
-
-Outbound calling — especially for sales and collections — is regulated in most jurisdictions (in the US, the TCPA and state analogues), and a growing number of places require disclosing that the caller is an AI. Call recording consent rules vary by state and country too.
-
-This shapes the schema, so it's cheaper to design in now than retrofit: campaigns need consent records, per-number do-not-call state, calling-window rules by time zone, and a recording-consent flag per jurisdiction. Worth a conversation with whoever owns compliance before the first dial.
-
-## History
-
-This repo previously held a Pipecat-based prototype (Deepgram → Claude → Cartesia over WebRTC). It's superseded by the LiveKit stack but preserved in git history at commit `53a8351` if any of it is worth revisiting.
+- API: **22 tests pass** — tenant isolation, DNC precedence, revoked-consent handling, timezone calling windows (including fail-closed on unknown zones), transcript ordering.
+- Compliance gate end-to-end: agent → live API. No consent → blocked; DNC → blocked; API down → **blocked** (fail-closed).
+- Chatterbox: real 24 kHz speech through LiveKit's `AudioEmitter`, correct 16-bit PCM.
+- Dashboard: `pnpm build` succeeds (6 routes). Required one upstream fix — `motion` v12 rejects a widened `ease: string`, fixed by annotating `MotionProps`.
+- Agent: imports clean on `livekit-agents` 1.6.10; torch stays unloaded unless Chatterbox is selected.

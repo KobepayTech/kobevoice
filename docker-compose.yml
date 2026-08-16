@@ -1,0 +1,59 @@
+# Local development stack for Kobe Voice.
+#
+# Brings up Postgres, the control-plane API, the voice agent worker, and the
+# supervisor dashboard. Telephony (SIP trunk, phone numbers) is external and is
+# NOT started here — see README.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: kobevoice
+      POSTGRES_PASSWORD: kobevoice
+      POSTGRES_DB: kobevoice
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The API's migrations fail confusingly if it connects before Postgres is
+      # accepting queries, so downstream services wait on this.
+      test: ["CMD-SHELL", "pg_isready -U kobevoice -d kobevoice"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+    environment:
+      DATABASE_URL: postgresql+psycopg://kobevoice:kobevoice@postgres:5432/kobevoice
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  agent:
+    build:
+      context: ./agent
+    env_file:
+      - ./agent/.env.local
+    environment:
+      KOBEOS_API_BASE: http://api:8000
+    depends_on:
+      - api
+    # No ports: the worker dials out to LiveKit rather than accepting inbound HTTP.
+
+  dashboard:
+    build:
+      context: ./dashboard
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

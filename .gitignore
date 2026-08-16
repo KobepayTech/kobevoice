@@ -11,3 +11,5 @@ uv.lock
 node_modules/
 .next/
 *.egg-info/
+*.db
+.pnpm-store/
