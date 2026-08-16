@@ -54,6 +54,38 @@ Agents also expose an `add_to_do_not_call` tool, so a caller saying "stop callin
 
 The 08:00–21:00 default reflects US TCPA hours. It is a starting point, not a jurisdiction survey — confirm with whoever owns compliance before dialling.
 
+## Running with no per-use vendor billing
+
+`KOBEVOICE_STACK=local` swaps every metered model service for software you run yourself:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml up
+docker compose exec ollama ollama pull qwen2.5:7b-instruct
+```
+
+| Layer | Hosted default | Local replacement | Licence |
+|---|---|---|---|
+| Media server | LiveKit Cloud | `livekit-server` | Apache 2.0 |
+| STT | AssemblyAI via Inference | Whisper (speaches) | MIT |
+| LLM | Gemma via Inference | Qwen 2.5 via Ollama | Apache 2.0 |
+| TTS | Fish Audio via Inference | Chatterbox | MIT |
+| VAD | — | Silero | MIT |
+| Turn detection | LiveKit Inference | `livekit-local-inference` | Apache 2.0 code; models free but **LiveKit-Agents-only** |
+
+Components mix freely — `KOBEVOICE_TTS=local` with a hosted LLM is valid while a GPU is being provisioned.
+
+### What this does not remove
+
+Being blunt, because "no vendor billing" is not the same as free:
+
+**Telephony still costs money, and there is no free option.** A carrier charges for each phone number (typically ~$1–2/month) and for minutes. Numbers are regulated, carrier-allocated resources — no amount of self-hosting changes that. Self-hosting LiveKit means you bring your own SIP trunk; the trunk is still a paid account. **This is the one cost that cannot be engineered away**, and for a call center it is likely the largest line item.
+
+**Hardware costs money.** Chatterbox and a 7B LLM both need a GPU. Measured here: Chatterbox on CPU runs at RTF 12–24 — unusable for live calls. That's either a machine you buy or an instance you rent. Self-hosting moves spend from per-minute vendor invoices to fixed capacity you must size and operate.
+
+**Model licences still bind.** Everything defaulted to above is MIT or Apache 2.0, which permit commercial use outright. If you swap models, check first: Llama carries a 700M-MAU restriction, and `fish-speech` is non-commercial without a written agreement (see below). A permissive default was chosen deliberately.
+
+The honest summary: the local stack eliminates **per-use AI billing** and keeps your audio on your own infrastructure. It does not make the product free to run.
+
 ## Text-to-speech
 
 Selected by `KOBEVOICE_TTS`:

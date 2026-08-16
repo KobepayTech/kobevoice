@@ -1,0 +1,67 @@
+# Self-hosted model stack — no per-use vendor billing.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up
+#
+# Replaces the three metered services (LiveKit Inference for STT/LLM/TTS, and
+# LiveKit Cloud for media) with software you run yourself. Read the cost section
+# in the README first: this removes vendor invoices, not costs. Telephony and
+# GPU hardware are still paid for, and neither has a free option.
+
+services:
+  # LiveKit media server — Apache 2.0. Replaces LiveKit Cloud.
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --dev --bind 0.0.0.0
+    ports:
+      - "7880:7880" # HTTP / WebSocket signalling
+      - "7881:7881" # TURN over TCP
+      - "50000-50100:50000-50100/udp" # WebRTC media
+    # --dev enables a well-known API key/secret pair. Fine locally; generate real
+    # credentials and a config file before this is reachable from the internet.
+
+  # Local LLM. Ollama exposes an OpenAI-compatible API, which the agent's
+  # openai plugin drives directly.
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    # Pull a model once the container is up:
+    #   docker compose exec ollama ollama pull qwen2.5:7b-instruct
+    # Uncomment for GPU (needs the NVIDIA container toolkit on the host):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Local Whisper behind an OpenAI-compatible /v1/audio/transcriptions endpoint.
+  stt:
+    image: ghcr.io/speaches-ai/speaches:latest-cpu
+    ports:
+      - "8001:8000"
+    volumes:
+      - hf-cache:/home/ubuntu/.cache/huggingface
+    # Swap to the CUDA image and add the GPU block above for realtime accuracy;
+    # the CPU image is workable for testing but adds noticeable latency.
+
+  agent:
+    environment:
+      KOBEVOICE_STACK: local
+      LIVEKIT_URL: ws://livekit:7880
+      LOCAL_LLM_URL: http://ollama:11434/v1
+      LOCAL_STT_URL: http://stt:8000/v1
+      # Chatterbox needs a GPU: measured RTF 12-24 on CPU, which is dead air on
+      # a live call. Set explicitly so nothing falls back to CPU silently.
+      CHATTERBOX_DEVICE: cuda
+    depends_on:
+      - livekit
+      - ollama
+      - stt
+
+volumes:
+  ollama:
+  hf-cache:

@@ -25,7 +25,7 @@ class Assistant(Agent):
         super().__init__(
             # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
             # See all available models at https://docs.livekit.io/agents/models/llm/
-            llm=inference.LLM(model="google/gemma-4-31b-it"),
+            llm=_build_llm(),
             # To use a realtime model instead of a voice pipeline, replace the LLM
             # with a RealtimeModel and remove the STT/TTS from the AgentSession
             # (Note: This is for the OpenAI Realtime API. For other providers, see https://docs.livekit.io/agents/models/realtime/)
@@ -92,33 +92,95 @@ class Assistant(Agent):
 server = AgentServer()
 
 
-@server.rtc_session(agent_name="my-agent")
+# --------------------------------------------------------------------------
+# Model selection
+#
+# KOBEVOICE_STACK picks the whole profile:
+#
+#   "hosted" (default) — LiveKit Inference gateway. Needs LIVEKIT_API_KEY and
+#       bills per use, but needs no GPU.
+#   "local"            — every model runs on your own hardware, with no
+#       per-use vendor billing: Whisper for STT, an Ollama-served open-weight
+#       LLM, and Chatterbox for TTS. Requires a GPU. See README for what this
+#       does and does not remove from the bill.
+#
+# Individual components can still be overridden (KOBEVOICE_STT/LLM/TTS) for
+# mixed setups, e.g. local TTS with a hosted LLM while a GPU is provisioned.
+# --------------------------------------------------------------------------
+
+
+def _stack() -> str:
+    return os.getenv("KOBEVOICE_STACK", "hosted").strip().lower()
+
+
+def _component(name: str) -> str:
+    """Resolve one component, falling back to the stack default."""
+    explicit = os.getenv(f"KOBEVOICE_{name.upper()}")
+    if explicit:
+        return explicit.strip().lower()
+    return "local" if _stack() == "local" else "inference"
+
+
+def _build_stt():
+    choice = _component("stt")
+
+    if choice == "inference":
+        return inference.STT(model="assemblyai/universal-3-5-pro", language="en")
+
+    if choice == "local":
+        # Any OpenAI-compatible transcription server works here — e.g. speaches
+        # or faster-whisper-server running Whisper locally. api_key is required
+        # by the client but unused by local servers.
+        from livekit.plugins import openai
+
+        return openai.STT(
+            model=os.getenv("LOCAL_STT_MODEL", "Systran/faster-whisper-small"),
+            base_url=os.getenv("LOCAL_STT_URL", "http://localhost:8001/v1"),
+            api_key=os.getenv("LOCAL_STT_KEY", "not-needed"),
+        )
+
+    raise ValueError(f"Unknown STT {choice!r}. Use 'inference' or 'local'.")
+
+
+def _build_llm():
+    choice = _component("llm")
+
+    if choice == "inference":
+        return inference.LLM(model="google/gemma-4-31b-it")
+
+    if choice == "local":
+        from livekit.plugins import openai
+
+        # Ollama speaks the OpenAI API, so the openai plugin drives it directly.
+        # Default model is Apache-2.0 licensed — see the README licence table
+        # before substituting one with usage restrictions (Llama has them).
+        return openai.LLM.with_ollama(
+            model=os.getenv("LOCAL_LLM_MODEL", "qwen2.5:7b-instruct"),
+            base_url=os.getenv("LOCAL_LLM_URL", "http://localhost:11434/v1"),
+        )
+
+    raise ValueError(f"Unknown LLM {choice!r}. Use 'inference' or 'local'.")
+
+
 def _build_tts():
-    """Select the TTS backend from KOBEVOICE_TTS.
+    choice = _component("tts")
 
-    "inference" (default) uses LiveKit's hosted gateway. "chatterbox" runs a
-    self-hosted Chatterbox model, which is what supports cloning an agent voice
-    from a local reference clip without sending it to a third party.
-    """
-    provider = os.getenv("KOBEVOICE_TTS", "inference").strip().lower()
-
-    if provider == "inference":
+    if choice == "inference":
         return inference.TTS(
             model="fishaudio/s2.1-pro", voice="fa4c9eb3dccc4806b382b40d61c6b10a"
         )
 
-    if provider == "chatterbox":
+    if choice in ("local", "chatterbox"):
         # Imported lazily: this pulls in torch, which we don't want loaded on
         # workers that never use it.
         from chatterbox_tts import build_tts
 
         return build_tts(voice_sample=os.getenv("CHATTERBOX_VOICE_SAMPLE") or None)
 
-    raise ValueError(
-        f"Unknown KOBEVOICE_TTS {provider!r}. Use 'inference' or 'chatterbox'."
-    )
+    raise ValueError(f"Unknown TTS {choice!r}. Use 'inference' or 'chatterbox'.")
 
 
+@server.rtc_session(agent_name="my-agent")
 async def my_agent(ctx: JobContext):
     # Logging setup
     # Add any other context you want in all log entries here
@@ -130,7 +192,7 @@ async def my_agent(ctx: JobContext):
     session = AgentSession(
         # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
         # See all available models at https://docs.livekit.io/agents/models/stt/
-        stt=inference.STT(model="assemblyai/universal-3-5-pro", language="en"),
+        stt=_build_stt(),
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=_build_tts(),

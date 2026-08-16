@@ -38,7 +38,9 @@ services:
     build:
       context: ./agent
     env_file:
-      - ./agent/.env.local
+      # Gitignored and absent on a fresh clone — don't block `compose config`.
+      - path: ./agent/.env.local
+        required: false
     environment:
       KOBEOS_API_BASE: http://api:8000
     depends_on:
