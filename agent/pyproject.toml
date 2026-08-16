@@ -15,16 +15,21 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Self-hosted Chatterbox TTS. Kept optional because it pulls torch (~2GB) and
-# needs a GPU in practice — see the RTF measurements in the README.
+# Self-hosted Chatterbox TTS, vendored in vendor/chatterbox (MIT, upstream
+# notice retained there). Kept optional because it pulls torch (~2GB) and needs
+# a GPU in practice — see the RTF measurements in the README.
+#
+# Installed from the local path rather than PyPI so the model source is ours to
+# modify (fine-tuning, streaming) and so the build is reproducible without
+# depending on an upstream release. The vendored copy also carries the Turbo and
+# Nano variants, which the PyPI 0.1.7 release does not ship.
 chatterbox = [
-    "chatterbox-tts>=0.1.7",
+    "chatterbox-tts",
     "numpy",
-    # perth (Chatterbox's watermarker) imports pkg_resources, which setuptools
-    # removed in 81. Without this pin the model fails to load with a confusing
-    # "'NoneType' object is not callable".
-    "setuptools<81",
 ]
+
+[tool.uv.sources]
+chatterbox-tts = { path = "vendor/chatterbox", editable = true }
 
 [dependency-groups]
 dev = [

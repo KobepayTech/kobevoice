@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chatterbox-tts"
+version = "0.1.7"
+description = "Chatterbox TTS, vendored into Kobe Voice from resemble-ai/chatterbox (MIT)."
+requires-python = ">=3.10"
+
+# Kept in sync with upstream, with two deliberate differences:
+#
+#   - gradio is dropped. Upstream needs it only for the demo apps
+#     (gradio_*_app.py), which are not vendored. It is a large dependency and
+#     nothing we import touches it.
+#   - setuptools<81 is pinned. Chatterbox's perth watermarker imports
+#     pkg_resources, removed in setuptools 81; without the pin the model fails
+#     to load with a misleading "'NoneType' object is not callable".
+dependencies = [
+    "numpy>=1.24.0,<2.0.0; python_version < '3.13'",
+    "numpy>=2.0.0; python_version >= '3.13'",
+    "librosa==0.11.0",
+    "s3tokenizer",
+    "torch==2.6.0; python_version < '3.14'",
+    "torch>=2.9.0; python_version >= '3.14'",
+    "torchaudio==2.6.0; python_version < '3.14'",
+    "torchaudio>=2.9.0; python_version >= '3.14'",
+    "transformers==5.2.0",
+    "diffusers==0.29.0",
+    "resemble-perth",
+    "conformer==0.3.2",
+    "safetensors==0.5.3",
+    "spacy-pkuseg",
+    "pykakasi==2.3.0",
+    "pyloudnorm",
+    "setuptools<81",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

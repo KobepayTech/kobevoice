@@ -99,7 +99,17 @@ Selected by `KOBEVOICE_TTS`:
 
 Two upstream constraints are handled in `agent/src/chatterbox_tts.py`: the model has **no streaming API** (so it is wrapped in LiveKit's `StreamAdapter` to speak sentence-by-sentence rather than after the whole reply), and it is **synchronous** (so generation runs in a thread executor instead of blocking every other call on the worker).
 
-**Packaging trap:** Chatterbox's `perth` watermarker imports `pkg_resources`, removed in setuptools 81. Without the `setuptools<81` pin the model fails with a misleading `'NoneType' object is not callable`.
+**Packaging trap:** Chatterbox's `perth` watermarker imports `pkg_resources`, removed in setuptools 81. Without the `setuptools<81` pin the model fails with a misleading `'NoneType' object is not callable`. The pin lives in `agent/vendor/chatterbox/pyproject.toml`.
+
+### Chatterbox is vendored, not depended on
+
+The model source lives in `agent/vendor/chatterbox/` (MIT; Resemble AI's copyright notice retained in `vendor/chatterbox/LICENSE`) and is installed from that path rather than from PyPI. Three reasons:
+
+- **It is ours to modify** — fine-tuning for Swahili quality, or adding the streaming API the model lacks, both mean changing model code.
+- **Reproducible builds** — no dependency on an upstream release staying available or unchanged.
+- **Turbo and Nano** — the GitHub source carries `ChatterboxTurboTTS` (built for low-latency voice agents) and a Nano variant claimed at 3x realtime on 8 CPU cores. **Neither ships in the PyPI 0.1.7 release.** If Nano's claim holds it could remove the GPU requirement entirely — worth testing before buying hardware.
+
+The tradeoff is that upstream fixes no longer arrive automatically; pulling them is now a deliberate merge.
 
 ### Languages, including Swahili
 
@@ -118,7 +128,6 @@ Full list: `ar da de el en es fi fr he hi it ja ko ms nl no pl pt ru sv sw tr zh
 ### Considered and rejected
 
 - **fish-speech** — Fish Audio Research License: non-commercial without a separate written agreement, and that covers derivative works, so modifying it changes nothing. Use the hosted gateway instead (which is what `inference` does).
-- **[Miso TTS 8B](https://github.com/Shard-MW/misotts)** — MIT-with-attribution (only binding above 50M MAU or $10M/month revenue), 24 kHz, voice cloning via audio context, no streaming. **English only** — its README states this twice and the code contains no language handling, so it cannot serve Swahili. It is also ~16x Chatterbox's parameters, meaning materially more GPU per concurrent call. Revisit only as an English-quality upgrade if GPU headroom allows.
 
 ## API surface
 

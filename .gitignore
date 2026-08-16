@@ -13,3 +13,4 @@ node_modules/
 *.egg-info/
 *.db
 .pnpm-store/
+agent/vendor/chatterbox/src/*.egg-info/
