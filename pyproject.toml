@@ -1,0 +1,12 @@
+[project]
+name = "kobevoice"
+version = "0.1.0"
+description = "Real-time voice agent built on Pipecat"
+requires-python = ">=3.11"
+dependencies = [
+    "pipecat-ai[anthropic,cartesia,deepgram,runner,silero,webrtc]==1.7.0",
+    "python-dotenv>=1.0",
+]
+
+[tool.uv]
+package = false
