@@ -28,6 +28,7 @@ from pipecat.runner.utils import create_transport
 from pipecat.services.anthropic.llm import AnthropicLLMService
 from pipecat.services.cartesia.tts import CartesiaTTSService
 from pipecat.services.deepgram.stt import DeepgramSTTService
+from pipecat.services.fish.tts import FishAudioTTSService
 from pipecat.transports.base_transport import TransportParams
 from pipecat.workers.runner import WorkerRunner
 
@@ -56,6 +57,33 @@ def _require(name: str) -> str:
     return value
 
 
+def build_tts():
+    """Construct the configured text-to-speech service.
+
+    Both providers stream PCM back over a websocket, so they are interchangeable
+    in the pipeline — only credentials and voice identifiers differ.
+    """
+    provider = os.getenv("KOBEVOICE_TTS", "cartesia").strip().lower()
+
+    if provider == "cartesia":
+        return CartesiaTTSService(
+            api_key=_require("CARTESIA_API_KEY"),
+            settings=CartesiaTTSService.Settings(
+                voice=os.getenv("CARTESIA_VOICE_ID", "71a7ad14-091c-4e8e-a314-022ece01c121"),
+            ),
+        )
+
+    if provider == "fish":
+        # Fish Audio's hosted API (api.fish.audio). This is a different thing from
+        # self-hosting the fish-speech weights — see the licensing note in README.
+        return FishAudioTTSService(
+            api_key=_require("FISH_API_KEY"),
+            settings=FishAudioTTSService.Settings(voice=_require("FISH_VOICE_ID")),
+        )
+
+    raise RuntimeError(f"Unknown KOBEVOICE_TTS provider {provider!r}. Use 'cartesia' or 'fish'.")
+
+
 # Every supported transport needs VAD on the input side so the pipeline can tell
 # when the caller has stopped speaking and interrupt playback when they start again.
 transport_params = {
@@ -80,12 +108,7 @@ transport_params = {
 async def run_bot(transport) -> None:
     """Build and run the voice pipeline for one connected caller."""
     stt = DeepgramSTTService(api_key=_require("DEEPGRAM_API_KEY"))
-    tts = CartesiaTTSService(
-        api_key=_require("CARTESIA_API_KEY"),
-        settings=CartesiaTTSService.Settings(
-            voice=os.getenv("CARTESIA_VOICE_ID", "71a7ad14-091c-4e8e-a314-022ece01c121"),
-        ),
-    )
+    tts = build_tts()
     llm = AnthropicLLMService(
         api_key=_require("ANTHROPIC_API_KEY"),
         settings=AnthropicLLMService.Settings(model=LLM_MODEL),
