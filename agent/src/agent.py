@@ -1,4 +1,5 @@
 import logging
+import os
 import textwrap
 
 from dotenv import load_dotenv
@@ -92,6 +93,32 @@ server = AgentServer()
 
 
 @server.rtc_session(agent_name="my-agent")
+def _build_tts():
+    """Select the TTS backend from KOBEVOICE_TTS.
+
+    "inference" (default) uses LiveKit's hosted gateway. "chatterbox" runs a
+    self-hosted Chatterbox model, which is what supports cloning an agent voice
+    from a local reference clip without sending it to a third party.
+    """
+    provider = os.getenv("KOBEVOICE_TTS", "inference").strip().lower()
+
+    if provider == "inference":
+        return inference.TTS(
+            model="fishaudio/s2.1-pro", voice="fa4c9eb3dccc4806b382b40d61c6b10a"
+        )
+
+    if provider == "chatterbox":
+        # Imported lazily: this pulls in torch, which we don't want loaded on
+        # workers that never use it.
+        from chatterbox_tts import build_tts
+
+        return build_tts(voice_sample=os.getenv("CHATTERBOX_VOICE_SAMPLE") or None)
+
+    raise ValueError(
+        f"Unknown KOBEVOICE_TTS {provider!r}. Use 'inference' or 'chatterbox'."
+    )
+
+
 async def my_agent(ctx: JobContext):
     # Logging setup
     # Add any other context you want in all log entries here
@@ -106,9 +133,7 @@ async def my_agent(ctx: JobContext):
         stt=inference.STT(model="assemblyai/universal-3-5-pro", language="en"),
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
-        tts=inference.TTS(
-            model="fishaudio/s2.1-pro", voice="fa4c9eb3dccc4806b382b40d61c6b10a"
-        ),
+        tts=_build_tts(),
         turn_handling=TurnHandlingOptions(
             # The LiveKit turn detector determines when the user is done speaking and the agent should respond.
             # TurnDetector is an end-of-turn model that listens to the user's audio directly, combining

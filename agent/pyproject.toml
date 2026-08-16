@@ -14,6 +14,18 @@ dependencies = [
     "python-dotenv",
 ]
 
+[project.optional-dependencies]
+# Self-hosted Chatterbox TTS. Kept optional because it pulls torch (~2GB) and
+# needs a GPU in practice — see the RTF measurements in the README.
+chatterbox = [
+    "chatterbox-tts>=0.1.7",
+    "numpy",
+    # perth (Chatterbox's watermarker) imports pkg_resources, which setuptools
+    # removed in 81. Without this pin the model fails to load with a confusing
+    # "'NoneType' object is not callable".
+    "setuptools<81",
+]
+
 [dependency-groups]
 dev = [
     "pytest",

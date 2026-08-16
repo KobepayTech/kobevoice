@@ -61,6 +61,45 @@ Two consequences worth being deliberate about:
 
 **The Fish Audio licence question is resolved.** The starter's default TTS is Fish Audio S2.1 Pro delivered *through LiveKit's commercial gateway* — so we get that voice quality on normal commercial terms, with no GPU and none of the non-commercial research-licence constraints that apply to self-hosting the `fish-speech` weights directly.
 
+## Voice cloning: self-hosted Chatterbox
+
+For cloned agent voices without sending a reference clip to a third party, `agent/src/chatterbox_tts.py` is a LiveKit TTS plugin wrapping [Chatterbox](https://github.com/resemble-ai/chatterbox) (Resemble AI, **MIT** — commercial use permitted outright).
+
+```bash
+cd agent
+uv pip install --python .venv/bin/python -e ".[chatterbox]"
+KOBEVOICE_TTS=chatterbox CHATTERBOX_VOICE_SAMPLE=./voices/agent.wav \
+  .venv/bin/python src/agent.py dev
+```
+
+Cloning takes a reference clip of roughly ten seconds. There is no LiveKit plugin for Chatterbox upstream, so this one is ours.
+
+### Measured behaviour, not vendor claims
+
+Verified locally on this codebase:
+
+| Property | Result |
+|---|---|
+| Audio out of the plugin | Clean speech, 24 kHz mono, correct 16-bit PCM |
+| Model load | ~18 s (once, at worker start via `prewarm()`) |
+| **CPU real-time factor** | **~12–24x slower than realtime** |
+
+**That RTF is the headline: Chatterbox needs a GPU.** At RTF 12 a two-second reply takes twenty-four seconds to synthesize — dead air on a phone call. `CHATTERBOX_DEVICE` therefore defaults to `cuda` and never silently falls back to CPU.
+
+### Two upstream constraints the plugin works around
+
+**No streaming API.** `generate()` returns one complete waveform, so time-to-first-audio equals full synthesis time. `build_tts()` wraps the model in LiveKit's `StreamAdapter` with a sentence tokenizer, so the agent starts speaking after the first sentence rather than the last. Use `build_tts()`, not `ChatterboxTTS` directly.
+
+**Synchronous and compute-bound.** Calling it inline would block the event loop and stall every other call on the worker, so generation runs in a thread executor.
+
+### A packaging trap worth knowing
+
+Chatterbox's watermarker (`perth`) imports `pkg_resources`, which setuptools removed in v81. On a modern venv the model fails to load with a misleading `TypeError: 'NoneType' object is not callable`. The `chatterbox` extra pins `setuptools<81` to prevent it.
+
+### Still unverified
+
+Everything above was measured on CPU. Latency on a GPU, and cloning quality from a real reference clip, remain untested — I had no GPU and no reference sample. Those are the two things to check before committing Chatterbox to production.
+
 Swapping to OpenAI Realtime is a documented one-line change in `src/agent.py` (install `livekit-agents[openai]`, replace the `llm=` argument); Anthropic and others are available the same way.
 
 ## Before outbound dialling goes live
