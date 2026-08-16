@@ -10,3 +10,4 @@ __pycache__/
 uv.lock
 node_modules/
 .next/
+*.egg-info/

@@ -1,3 +1,0 @@
-livekit-agents>=1.6.9
-livekit-plugins-ai-coustics~=0.2
-python-dotenv
