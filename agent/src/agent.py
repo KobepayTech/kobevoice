@@ -113,6 +113,15 @@ def _stack() -> str:
     return os.getenv("KOBEVOICE_STACK", "hosted").strip().lower()
 
 
+def _language() -> str:
+    """Conversation language as an ISO code, e.g. "en" or "sw" (Swahili).
+
+    Applied to STT and TTS together — transcribing Swahili while speaking
+    English would half-work and be confusing to debug.
+    """
+    return os.getenv("KOBEVOICE_LANGUAGE", "en").strip().lower()
+
+
 def _component(name: str) -> str:
     """Resolve one component, falling back to the stack default."""
     explicit = os.getenv(f"KOBEVOICE_{name.upper()}")
@@ -125,7 +134,9 @@ def _build_stt():
     choice = _component("stt")
 
     if choice == "inference":
-        return inference.STT(model="assemblyai/universal-3-5-pro", language="en")
+        return inference.STT(
+            model="assemblyai/universal-3-5-pro", language=_language()
+        )
 
     if choice == "local":
         # Any OpenAI-compatible transcription server works here — e.g. speaches
@@ -133,10 +144,13 @@ def _build_stt():
         # by the client but unused by local servers.
         from livekit.plugins import openai
 
+        # Whisper covers Swahili and ~98 other languages; passing the code
+        # explicitly beats autodetect, which can drift mid-call on short turns.
         return openai.STT(
             model=os.getenv("LOCAL_STT_MODEL", "Systran/faster-whisper-small"),
             base_url=os.getenv("LOCAL_STT_URL", "http://localhost:8001/v1"),
             api_key=os.getenv("LOCAL_STT_KEY", "not-needed"),
+            language=_language(),
         )
 
     raise ValueError(f"Unknown STT {choice!r}. Use 'inference' or 'local'.")
@@ -175,7 +189,10 @@ def _build_tts():
         # workers that never use it.
         from chatterbox_tts import build_tts
 
-        return build_tts(voice_sample=os.getenv("CHATTERBOX_VOICE_SAMPLE") or None)
+        return build_tts(
+            voice_sample=os.getenv("CHATTERBOX_VOICE_SAMPLE") or None,
+            language=_language(),
+        )
 
     raise ValueError(f"Unknown TTS {choice!r}. Use 'inference' or 'chatterbox'.")
 

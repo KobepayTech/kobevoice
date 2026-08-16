@@ -40,6 +40,14 @@ class _Options:
     cfg_weight: float
     temperature: float
     device: str
+    language: str
+
+
+def supported_languages() -> dict[str, str]:
+    """Language codes the multilingual model accepts, e.g. ``{"sw": "Swahili"}``."""
+    from chatterbox import SUPPORTED_LANGUAGES
+
+    return dict(SUPPORTED_LANGUAGES)
 
 
 class ChatterboxTTS(tts.TTS):
@@ -50,6 +58,7 @@ class ChatterboxTTS(tts.TTS):
         *,
         voice_sample: str | None = None,
         device: str | None = None,
+        language: str = "en",
         exaggeration: float = 0.5,
         cfg_weight: float = 0.5,
         temperature: float = 0.8,
@@ -61,6 +70,9 @@ class ChatterboxTTS(tts.TTS):
             device: "cuda", "mps", or "cpu". Defaults to $CHATTERBOX_DEVICE, else
                 "cuda" — CPU runs ~12x slower than realtime and cannot hold a live
                 call, so it is never chosen implicitly.
+            language: ISO code. "en" loads the English model; anything else loads
+                the multilingual model, which covers 23 languages including
+                Swahili ("sw"). See :func:`supported_languages`.
             exaggeration: Emotional intensity.
             cfg_weight: Classifier-free guidance weight; higher tracks the
                 reference voice more closely.
@@ -69,6 +81,17 @@ class ChatterboxTTS(tts.TTS):
         if voice_sample is not None and not Path(voice_sample).is_file():
             # Fail at construction rather than on the first caller's turn.
             raise FileNotFoundError(f"voice_sample not found: {voice_sample}")
+
+        language = language.strip().lower()
+        if language != "en":
+            # Validate now: an unsupported code would otherwise surface as a
+            # confusing model error on the first caller's turn.
+            available = supported_languages()
+            if language not in available:
+                raise ValueError(
+                    f"language {language!r} is not supported. "
+                    f"Available: {', '.join(sorted(available))}"
+                )
 
         super().__init__(
             capabilities=tts.TTSCapabilities(streaming=False),
@@ -81,6 +104,7 @@ class ChatterboxTTS(tts.TTS):
             cfg_weight=cfg_weight,
             temperature=temperature,
             device=device or os.getenv("CHATTERBOX_DEVICE", "cuda"),
+            language=language,
         )
         self._model = None
         self._load_lock = asyncio.Lock()
@@ -95,7 +119,12 @@ class ChatterboxTTS(tts.TTS):
             return self._model
         async with self._load_lock:
             if self._model is None:
-                from chatterbox.tts import ChatterboxTTS as _Model
+                if self._opts.language == "en":
+                    from chatterbox.tts import ChatterboxTTS as _Model
+                else:
+                    # Separate checkpoint — larger, and only downloaded when a
+                    # non-English language is actually configured.
+                    from chatterbox.mtl_tts import ChatterboxMultilingualTTS as _Model
 
                 self._model = await asyncio.to_thread(
                     _Model.from_pretrained, device=self._opts.device
@@ -135,15 +164,19 @@ class _ChunkedStream(tts.ChunkedStream):
             mime_type="audio/pcm",
         )
 
+        kwargs: dict = {
+            "audio_prompt_path": opts.voice_sample,
+            "exaggeration": opts.exaggeration,
+            "cfg_weight": opts.cfg_weight,
+            "temperature": opts.temperature,
+        }
+        if opts.language != "en":
+            # Only the multilingual checkpoint accepts language_id; passing it to
+            # the English model is a TypeError.
+            kwargs["language_id"] = opts.language
+
         # Blocking and compute-bound — must not run on the event loop.
-        wav = await asyncio.to_thread(
-            model.generate,
-            self._input_text,
-            audio_prompt_path=opts.voice_sample,
-            exaggeration=opts.exaggeration,
-            cfg_weight=opts.cfg_weight,
-            temperature=opts.temperature,
-        )
+        wav = await asyncio.to_thread(model.generate, self._input_text, **kwargs)
 
         # torch float32 in [-1, 1] -> 16-bit little-endian PCM.
         samples = wav.squeeze().detach().cpu().numpy()
@@ -158,6 +191,7 @@ def build_tts(
     *,
     voice_sample: str | None = None,
     device: str | None = None,
+    language: str = "en",
 ) -> tts.TTS:
     """Chatterbox wrapped so the agent speaks sentence-by-sentence.
 
@@ -166,6 +200,6 @@ def build_tts(
     turn, so audio starts after the first sentence instead of the last.
     """
     return tts.StreamAdapter(
-        tts=ChatterboxTTS(voice_sample=voice_sample, device=device),
+        tts=ChatterboxTTS(voice_sample=voice_sample, device=device, language=language),
         sentence_tokenizer=tokenize.basic.SentenceTokenizer(),
     )

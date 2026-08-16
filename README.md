@@ -101,10 +101,24 @@ Two upstream constraints are handled in `agent/src/chatterbox_tts.py`: the model
 
 **Packaging trap:** Chatterbox's `perth` watermarker imports `pkg_resources`, removed in setuptools 81. Without the `setuptools<81` pin the model fails with a misleading `'NoneType' object is not callable`.
 
+### Languages, including Swahili
+
+Set `KOBEVOICE_LANGUAGE` to an ISO code; it drives STT and TTS together, so the agent never transcribes one language while speaking another.
+
+```bash
+KOBEVOICE_LANGUAGE=sw KOBEVOICE_STACK=local docker compose up
+```
+
+Chatterbox's multilingual checkpoint covers **23 languages including Swahili (`sw`)**, and is loaded automatically whenever the language is not `en` (the English-only checkpoint stays the default, so nothing extra is downloaded for English deployments). Whisper covers Swahili on the STT side. Verified locally: Swahili speech generated through the LiveKit plugin, not just the raw model.
+
+Full list: `ar da de el en es fi fr he hi it ja ko ms nl no pl pt ru sv sw tr zh`.
+
+**The gap to check before shipping Swahili:** TTS and STT are covered, but the **LLM** still has to *write* good Swahili. `qwen2.5:7b-instruct` handles it unevenly. Test the LLM's Swahili on your actual call scripts before launch — a fluent voice reading awkward phrasing is worse than the reverse, and this is the weakest link in the chain.
+
 ### Considered and rejected
 
 - **fish-speech** — Fish Audio Research License: non-commercial without a separate written agreement, and that covers derivative works, so modifying it changes nothing. Use the hosted gateway instead (which is what `inference` does).
-- **[Miso TTS 8B](https://github.com/Shard-MW/misotts)** — MIT-with-attribution (only binding above 50M MAU or $10M/month revenue), 24 kHz, voice cloning via audio context, English only, no streaming. Same integration shape as Chatterbox but ~16x the parameters, so materially more GPU per concurrent call. Worth revisiting as a quality upgrade if GPU headroom allows.
+- **[Miso TTS 8B](https://github.com/Shard-MW/misotts)** — MIT-with-attribution (only binding above 50M MAU or $10M/month revenue), 24 kHz, voice cloning via audio context, no streaming. **English only** — its README states this twice and the code contains no language handling, so it cannot serve Swahili. It is also ~16x Chatterbox's parameters, meaning materially more GPU per concurrent call. Revisit only as an English-quality upgrade if GPU headroom allows.
 
 ## API surface
 
