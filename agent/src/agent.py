@@ -76,12 +76,12 @@ class Assistant(Agent):
     # You also have to add `from livekit.agents import function_tool, RunContext` to the top of this file
     # @function_tool
     # async def lookup_weather(self, context: RunContext, location: str):
-    #     """Use this tool to look up current weather information in the given location.
+    #     """Use this tool to look up current weather information for the given location.
     #
     #     If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
     #
     #     Args:
-    #         location: The location to look up weather information for (e.g. city name)
+    #         location: The location to look up current weather information for (e.g. city name)
     #     """
     #
     #     logger.info(f"Looking up weather for {location}")
@@ -104,8 +104,9 @@ server = AgentServer()
 #       LLM, and Chatterbox for TTS. Requires a GPU. See README for what this
 #       does and does not remove from the bill.
 #
-# Individual components can still be overridden (KOBEVOICE_STT/LLM/TTS) for
-# mixed setups, e.g. local TTS with a hosted LLM while a GPU is provisioned.
+# For KobeAI school deployments, setting KOBEAI_BASE_URL makes the LLM stage
+# use KobeAI's authenticated OpenAI-compatible voice bridge. KobeVoice keeps
+# STT/TTS/media while KobeAI owns routing, model selection and school context.
 # --------------------------------------------------------------------------
 
 
@@ -157,7 +158,32 @@ def _build_stt():
 
 
 def _build_llm():
-    choice = _component("llm")
+    kobeai_base_url = os.getenv("KOBEAI_BASE_URL", "").strip()
+    choice = "kobeai" if kobeai_base_url else _component("llm")
+
+    if choice == "kobeai":
+        from livekit.plugins import openai
+
+        if not kobeai_base_url:
+            kobeai_base_url = os.getenv("KOBEAI_BASE_URL", "").strip()
+        secret = os.getenv("KOBEAI_VOICE_SECRET", "").strip()
+        if not kobeai_base_url:
+            raise ValueError(
+                "KOBEAI_BASE_URL is required when KOBEVOICE_LLM=kobeai"
+            )
+        if not secret:
+            raise ValueError(
+                "KOBEAI_VOICE_SECRET is required when routing KobeVoice through KobeAI"
+            )
+
+        # KobeAI exposes an authenticated Chat Completions bridge under the
+        # voice gateway. The OpenAI plugin sends the service secret as the
+        # bearer API key, so no custom LiveKit LLM implementation is required.
+        return openai.LLM(
+            model=os.getenv("KOBEAI_ROUTER_MODEL", "kobeai-router"),
+            base_url=f"{kobeai_base_url.rstrip('/')}/api/v1/voice/openai",
+            api_key=secret,
+        )
 
     if choice == "inference":
         return inference.LLM(model="google/gemma-4-31b-it")
@@ -173,7 +199,9 @@ def _build_llm():
             base_url=os.getenv("LOCAL_LLM_URL", "http://localhost:11434/v1"),
         )
 
-    raise ValueError(f"Unknown LLM {choice!r}. Use 'inference' or 'local'.")
+    raise ValueError(
+        f"Unknown LLM {choice!r}. Use 'inference', 'local', or 'kobeai'."
+    )
 
 
 def _build_tts():
@@ -224,7 +252,7 @@ async def my_agent(ctx: JobContext):
             # backchannel like "mhm" or "right", so the agent keeps talking through the latter.
             interruption={"mode": "adaptive"},
             # allow the LLM to generate a response while waiting for the end of turn
-            # See more at https://docs.livekit.io/agents/build/audio/#preemptive-generation
+            # See https://docs.livekit.io/agents/build/audio/#preemptive-generation
             preemptive_generation={"enabled": True},
         ),
         # Expressive mode injects the TTS provider's markup guide into the LLM prompt, so the model
@@ -248,7 +276,7 @@ async def my_agent(ctx: JobContext):
     )
 
     # # Add a virtual avatar to the session, if desired
-    # # For other providers, see https://docs.livekit.io/agents/models/avatar/
+    # # For other providers, see https://docs.livekit.io/agents/models/avatar/plugins/anam
     # avatar = anam.AvatarSession(
     #     persona_config=anam.PersonaConfig(
     #         name="...",
