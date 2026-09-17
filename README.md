@@ -13,8 +13,12 @@ kobevoice/
 ├── api/         Control plane — FastAPI + Postgres (tenants, calls, compliance, KobeOS)
 ├── agent/       Voice agent worker — LiveKit Agents, Chatterbox TTS, telephony tools
 ├── dashboard/   Supervisor web UI — Next.js 15 + LiveKit React
+├── vendor/      Vendored third-party source (see each VENDORED.md / LICENSE)
+│   └── voicebox/  Voicebox voice studio — reference, not wired into calls
 └── docker-compose.yml
 ```
+
+Chatterbox itself is vendored separately at `agent/vendor/chatterbox/`.
 
 `agent/` and `dashboard/` derive from LiveKit's MIT starters; upstream notices are kept in each directory's `LICENSE.livekit`.
 
@@ -74,6 +78,8 @@ docker compose exec ollama ollama pull qwen2.5:7b-instruct
 
 Components mix freely — `KOBEVOICE_TTS=local` with a hosted LLM is valid while a GPU is being provisioned.
 
+There is also a third LLM route: setting `KOBEAI_BASE_URL` (with `KOBEAI_VOICE_SECRET`) sends the LLM stage through KobeAI's authenticated OpenAI-compatible voice bridge, leaving STT, TTS and media here while KobeAI owns routing and model selection. It takes precedence over `KOBEVOICE_LLM` when set.
+
 ### What this does not remove
 
 Being blunt, because "no vendor billing" is not the same as free:
@@ -128,6 +134,19 @@ Full list: `ar da de el en es fi fr he hi it ja ko ms nl no pl pt ru sv sw tr zh
 ### Considered and rejected
 
 - **fish-speech** — Fish Audio Research License: non-commercial without a separate written agreement, and that covers derivative works, so modifying it changes nothing. Use the hosted gateway instead (which is what `inference` does).
+
+## Vendored reference: Voicebox
+
+[Voicebox](https://github.com/jamiepine/voicebox) (MIT) is vendored at `vendor/voicebox/` — see `vendor/voicebox/VENDORED.md` for what was kept and why.
+
+It is a **desktop voice studio, not a telephony component**, so nothing in the call pipeline imports it. It is here as a reference implementation, and two parts are worth lifting:
+
+- **`backend/backends/chatterbox_turbo_backend.py`** — a working adapter for Chatterbox Turbo, the low-latency variant. If our TTS latency proves marginal on real hardware, this is the code to borrow.
+- **`backend/services/profiles.py`** — voice-profile management (create a cloned voice, store it, reuse it). Our agent builder currently holds a single `voice_sample_uri` per agent; this is a more developed version of the same idea.
+
+~42 MB of Voicebox branding, app icons, and marketing video were excluded — all source code is present, and the artwork is a `git clone` away if ever needed.
+
+**It does not solve streaming.** Voicebox's Chatterbox adapters call `generate()` and return a finished waveform, exactly as ours do. Sentence-chunking via `StreamAdapter` remains the mitigation.
 
 ## API surface
 
