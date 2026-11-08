@@ -1,0 +1,21 @@
+services:
+  kobevoice:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+      VOICEBOX_URL: http://host.docker.internal:17493
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:8b}
+      VOICEBOX_PROFILE_ID: ${VOICEBOX_PROFILE_ID:-}
+      VOICEBOX_ENGINE: ${VOICEBOX_ENGINE:-chatterbox}
+      BUSINESS_CONFIG_PATH: /app/config/business.json
+      DATABASE_PATH: /app/data/kobevoice.db
+    volumes:
+      - ./config:/app/config
+      - kobevoice-data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+volumes:
+  kobevoice-data:

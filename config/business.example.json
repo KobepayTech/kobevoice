@@ -1,0 +1,28 @@
+{
+  "business_name": "Kobe Cargo",
+  "industry": "China to Tanzania air cargo and logistics",
+  "languages": ["English", "Kiswahili"],
+  "opening_hours": "Monday to Saturday, 8:00 AM to 6:00 PM",
+  "address": "Dar es Salaam, Tanzania",
+  "services": [
+    "Air cargo shipping from China to Tanzania",
+    "Warehouse receiving in China",
+    "Packing, customs coordination, and collection support",
+    "Shipment tracking assistance"
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "How do I track my cargo?",
+      "answer": "Provide your tracking or receipt number. Live tracking integration is the next milestone."
+    },
+    {
+      "question": "When are you open?",
+      "answer": "Monday to Saturday from 8:00 AM to 6:00 PM."
+    },
+    {
+      "question": "Where are you located?",
+      "answer": "Dar es Salaam, Tanzania."
+    }
+  ],
+  "escalation_message": "I do not have that information yet. I will record your request so a Kobe Cargo team member can contact you."
+}
